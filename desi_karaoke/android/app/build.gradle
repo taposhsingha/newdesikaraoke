@@ -55,7 +55,7 @@ android {
 
     defaultConfig {
         applicationId "com.desikaraoke.lite"
-        minSdkVersion 33
+        minSdkVersion 21
         targetSdkVersion 33
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
