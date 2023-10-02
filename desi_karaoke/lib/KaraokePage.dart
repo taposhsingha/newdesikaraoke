@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -178,7 +177,7 @@ class _KaraokePageState extends State<KaraokePage>
       }
     });
     FirebaseDatabase.instance
-        .reference()
+        .ref()
         .child("isFreeModeEnabled")
         .once()
         .then((value) {
@@ -189,12 +188,12 @@ class _KaraokePageState extends State<KaraokePage>
     var user = FirebaseAuth.instance.currentUser;
     uid = user!.uid;
     FirebaseDatabase.instance
-        .reference()
+        .ref()
         .child("users/${user.uid}/currenttime")
         .set(ServerValue.timestamp)
         .whenComplete(() {
       FirebaseDatabase.instance
-          .reference()
+          .ref()
           .child("users/${user.uid}")
           .once()
           .then((data) {
@@ -526,10 +525,10 @@ class _KaraokePageState extends State<KaraokePage>
 
   @override
   void dispose() {
-    plyerStatusSubscription?.cancel();
+    plyerStatusSubscription.cancel();
     audioEngine.stop();
     playerPositionSubscription.cancel();
-    subBluetooth?.cancel();
+    subBluetooth.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _fluWakeLock.disable();
     super.dispose();
@@ -592,8 +591,8 @@ class _KaraokePageState extends State<KaraokePage>
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
     StringBuffer stringBuffer = StringBuffer();
-    karaokeTimedText?.lines?.forEach((KaraokeLine it) {
-      it?.words?.forEach((word) {
+    karaokeTimedText.lines?.forEach((KaraokeLine it) {
+      it.words.forEach((word) {
         stringBuffer.write("$word ");
       });
       stringBuffer.write("\n");
@@ -607,20 +606,20 @@ class _KaraokePageState extends State<KaraokePage>
       ["", ""]
     ];
     int? hightlightwordNumber =
-        karaokeTimedText?.lyricHighlightEvent?.wordnumber;
+        karaokeTimedText.lyricHighlightEvent?.wordnumber;
 
     int highlightLine = 5;
-    if (karaokeTimedText?.lyricHighlightEvent?.line ==
-        karaokeTimedText!.lines?[0]) {
+    if (karaokeTimedText.lyricHighlightEvent?.line ==
+        karaokeTimedText.lines?[0]) {
       highlightLine = 0;
-    } else if (karaokeTimedText?.lyricHighlightEvent?.line ==
-        karaokeTimedText!.lines?[1]) {
+    } else if (karaokeTimedText.lyricHighlightEvent?.line ==
+        karaokeTimedText.lines?[1]) {
       highlightLine = 1;
     }
-      karaokeTimedText?.lines?.asMap()?.forEach((lineNum, line) {
+      karaokeTimedText.lines?.asMap().forEach((lineNum, line) {
       StringBuffer normalBuffer = StringBuffer();
       StringBuffer highlightBuffer = StringBuffer();
-      line?.words?.asMap()?.forEach((wordNum, word) {
+      line.words.asMap().forEach((wordNum, word) {
         if (highlightLine == lineNum && wordNum <= hightlightwordNumber!) {
           highlightBuffer.write("$word ");
         } else {

@@ -48,11 +48,11 @@ class _LoginPageState extends State<LoginPage> {
             Spacer(flex: 3),
             Text(
               "Welcome to",
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.displaySmall,
             ),
             Text(
               "Desi Karaoke",
-              style: Theme.of(context).textTheme.headline3,
+              style: Theme.of(context).textTheme.displayMedium,
             ),
             Spacer(flex: 4),
             Column(
@@ -61,7 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Please, sign in to continue:",
-                    style: Theme.of(context).textTheme.subtitle2,
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
                 // SignInButton(
@@ -100,9 +100,9 @@ class _LoginPageState extends State<LoginPage> {
 
     // final User user = (await _auth.signInWithCredential(credential)).user;
     // print(user.uid);
-    userRef = FirebaseDatabase.instance.reference().child("users/${user.uid}");
+    userRef = FirebaseDatabase.instance.ref().child("users/${user.uid}");
 
-    userRef?.once()?.then((data) {
+    userRef.once().then((data) {
       if (data.snapshot.value == null) {
         showDialog(
           barrierDismissible: false,
@@ -168,10 +168,10 @@ class _LoginPageState extends State<LoginPage> {
       signUpData['name'] = nameEditingController.text;
       signUpData['signuptime'] = ServerValue.timestamp;
       signUpData['currenttime'] = ServerValue.timestamp;
-      userRef?.set(signUpData)?.whenComplete(() {
+      userRef.set(signUpData).whenComplete(() {
         Navigator.of(context, rootNavigator: true).pop();
         onSuccessfulLogin();
-      })?.catchError((error) {
+      }).catchError((error) {
         print("Aight imma head out");
         _auth.signOut();
       });

@@ -101,7 +101,7 @@ makeTimedTexts(Karaoke karaoke) {
     int? time = timedLines.lastKeyBefore(line.endTime);
     LyricPair? pair = timedLines[time];
     var timeShift = line.startTime;
-    line.durations?.asMap()?.forEach((wordNum, duration) {
+    line.durations.asMap().forEach((wordNum, duration) {
       karaoke.timedTextMap[timeShift] =
           KaraokeTimedText(pair?.toArray(), LyricHighlightEvent(line, wordNum));
       timeShift += duration;
@@ -182,7 +182,7 @@ removeOverlaps() {
 }
 
 correctEndTimes() => karaokeLines.forEach((it) => it.endTime =
-    it.startTime + ((it.durations?.fold(0, (a, b) => a! + b)) ?? 0));
+    it.startTime + ((it.durations.fold(0, (a, b) => a! + b)) ?? 0));
 
 makeCountdownMap(Karaoke karaoke) {
   for (var line in karaokeLines) {

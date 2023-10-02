@@ -33,7 +33,7 @@ class Music {
 
   @override
   String toString() {
-    return effectivetitle ?? "no title";
+    return effectivetitle;
   }
 }
 
@@ -82,8 +82,8 @@ class Artist implements Comparable<Artist> {
   }
 
   bool contains(String query) {
-    return (this.artist?.toLowerCase()?.trim()?.contains(query) ?? false) ||
-        (this.banglaartist?.toLowerCase()?.trim()?.contains(query) ?? false) ||
-        (this.effectiveartist?.toLowerCase()?.trim()?.contains(query) ?? false);
+    return (this.artist.toLowerCase().trim().contains(query) ?? false) ||
+        (this.banglaartist.toLowerCase().trim().contains(query) ?? false) ||
+        (this.effectiveartist.toLowerCase().trim().contains(query) ?? false);
   }
 }

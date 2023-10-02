@@ -17,7 +17,7 @@ import 'flutter_audio_engine_platform_interface.dart';
 
 class FlutterAudioEngine {
   static const MethodChannel _channel =
-  const MethodChannel('flutter_audio_engine');
+  MethodChannel('flutter_audio_engine');
 
   static Future<String> get platformVersion async {
     final String version = await _channel.invokeMethod('getPlatformVersion');
@@ -30,8 +30,8 @@ class FlutterAudioEngine {
 
 class AudioEngine {
   static const MethodChannel platform =
-  const MethodChannel('flutter_audio_engine');
-  static const playerStatusChannel = const EventChannel("borhnn/playerStatus");
+  MethodChannel('flutter_audio_engine');
+  static const playerStatusChannel = EventChannel("borhnn/playerStatus");
   static const playerPositionChannel =
   const EventChannel("borhnn/playerPosition");
 
@@ -152,6 +152,5 @@ PlayerStatus fromCode(status) {
       return PlayerStatus.RESUMED;
     default:
       return PlayerStatus.NOT_INITIALIZED;
-      break;
   }
 }
