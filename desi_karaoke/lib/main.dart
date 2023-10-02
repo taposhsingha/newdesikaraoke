@@ -181,16 +181,12 @@ class _HomePageState extends State<HomePage> {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
                   return CircularProgressIndicator();
-                  break;
                 case ConnectionState.waiting:
                   return CircularProgressIndicator();
-                  break;
                 case ConnectionState.active:
                   return CircularProgressIndicator();
-                  break;
                 case ConnectionState.done:
                   return buildNavItem();
-                  break;
               }
               return CircularProgressIndicator();
             },
@@ -243,7 +239,7 @@ class _HomePageState extends State<HomePage> {
       return;
     } else {
       DatabaseReference musicDataRef =
-          FirebaseDatabase.instance.reference().child("music");
+          FirebaseDatabase.instance.ref().child("music");
       FirebaseDatabase.instance.setPersistenceEnabled(true);
       FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
       musicDataRef.keepSynced(true);
@@ -593,7 +589,7 @@ class _HomePageState extends State<HomePage> {
                       FormState? state = globalKey.currentState as FormState?;
                       if (state!.validate()) {
                         var songRequestRef = FirebaseDatabase.instance
-                            .reference()
+                            .ref()
                             .child("requests")
                             .push();
                         var songRequestData = Map<String, dynamic>();
@@ -663,7 +659,7 @@ class _HomePageState extends State<HomePage> {
                       //State<StatefulWidget>? state = globalKey.currentState;
                       if (globalKey.currentState!.validate()) {
                         var feedbackRef = FirebaseDatabase.instance
-                            .reference()
+                            .ref()
                             .child("feedback")
                             .push();
                         var feedbackData = Map<String, dynamic>();
@@ -674,9 +670,9 @@ class _HomePageState extends State<HomePage> {
                             FirebaseAuth.instance.currentUser?.displayName ?? "";
                         feedbackData['user_contact'] =
                             FirebaseAuth.instance.currentUser?.email ?? "";
-                        feedbackRef?.set(feedbackData)?.whenComplete(() {
+                        feedbackRef.set(feedbackData).whenComplete(() {
                           Navigator.pop(context);
-                        })?.catchError((error) {});
+                        }).catchError((error) {});
                       }
                     }),
               ],

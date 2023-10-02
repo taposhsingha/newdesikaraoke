@@ -15,16 +15,16 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_audio_engine/flutter_audio_engine.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flu_wake_lock/flu_wake_lock.dart';
 import 'dart:convert';
 import 'package:charset/charset.dart';
 
-
 class KaraokePage extends StatefulWidget {
   final Music music;
 
-  KaraokePage({ Key? key, required this.music}) : super(key: key);
+  KaraokePage({Key? key, required this.music}) : super(key: key);
 
   @override
   _KaraokePageState createState() => _KaraokePageState();
@@ -64,7 +64,7 @@ class _KaraokePageState extends State<KaraokePage>
   int _playerHalfstepDelta = 0;
   int _countdownPosition = 0;
   late PlayerStatus? statusBeforeBackground;
-  /*bool isFlushbarShown = false;*/
+  bool isFlushbarShown = false;
 
   // Data fields
   late String uid;
@@ -75,19 +75,19 @@ class _KaraokePageState extends State<KaraokePage>
   bool isFreeModeEnabled = false;
   int trialMillis = 1000 * 1000;
 
-  /*var flushbar = Flushbar(
+  var flushbar = Flushbar(
     title: "Microphone required",
     message:
         "Please, connect to a RANGS Desi Karaoke microphone to enjoy the full song",
-    mainButton: FlatButton(
+    mainButton: TextButton(
         child: Text(
           "Call Now",
           style: TextStyle(color: Colors.greenAccent),
         ),
-        onPressed: () => launch("tel://+8801748332274")),
+        onPressed: () => launchUrl(Uri.parse('tel://+8801748332274'))),
     duration: Duration(days: 365),
     isDismissible: false,
-  );*/
+  );
 
   Future<File> downloadFile(Reference ref) async {
     final String url = await ref.getDownloadURL();
@@ -197,8 +197,10 @@ class _KaraokePageState extends State<KaraokePage>
           .child("users/${user.uid}")
           .once()
           .then((data) {
-        int? currentTime = (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
-        int? signUpTime = (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
+        int? currentTime =
+            (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
+        int? signUpTime =
+            (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
 
         if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
           setPlaybackValidity(() {
@@ -310,10 +312,12 @@ class _KaraokePageState extends State<KaraokePage>
                           child: Center(
                             child: Text(
                               countDownText,
-                              style:
-                                  Theme.of(context).textTheme.displaySmall?.apply(
-                                        color: Colors.red,
-                                      ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .displaySmall
+                                  ?.apply(
+                                    color: Colors.red,
+                                  ),
                             ),
                           ),
                         ),
@@ -351,7 +355,6 @@ class _KaraokePageState extends State<KaraokePage>
                       ],
                     ),
                     duration: Duration(milliseconds: 1200),
-
                   ),
                 ),
                 Spacer(flex: 2),
@@ -547,9 +550,9 @@ class _KaraokePageState extends State<KaraokePage>
 
     String lyric = "";
 
-    if(hasUtf16LeBom(bytes)){
+    if (hasUtf16LeBom(bytes)) {
       lyric = Utf16Decoder().decodeUtf16Le(bytes);
-    }else{
+    } else {
       lyric = utf8.decode(bytes);
     }
     /*if (hasUtf16leBom(bytes)) {
@@ -616,7 +619,7 @@ class _KaraokePageState extends State<KaraokePage>
         karaokeTimedText.lines?[1]) {
       highlightLine = 1;
     }
-      karaokeTimedText.lines?.asMap().forEach((lineNum, line) {
+    karaokeTimedText.lines?.asMap().forEach((lineNum, line) {
       StringBuffer normalBuffer = StringBuffer();
       StringBuffer highlightBuffer = StringBuffer();
       line.words.asMap().forEach((wordNum, word) {
@@ -687,7 +690,7 @@ class _KaraokePageState extends State<KaraokePage>
         !isMusicTrialExpired ||
         isFreeModeEnabled;
 
-    /*switch (shouldPlayLoud) {
+    switch (shouldPlayLoud) {
       case false:
         if (!isFlushbarShown) {
           isFlushbarShown = true;
@@ -699,9 +702,9 @@ class _KaraokePageState extends State<KaraokePage>
           isFlushbarShown = false;
           flushbar.dismiss();
         }
-    }*/
-    audioEngine.setVolume(shouldPlayLoud ? 1.0 : 0.0);
     }
+    audioEngine.setVolume(shouldPlayLoud ? 1.0 : 0.0);
+  }
 }
 
 class DiscreteValueChanger extends StatefulWidget {
@@ -715,12 +718,12 @@ class DiscreteValueChanger extends StatefulWidget {
 
   DiscreteValueChanger(
       {Key? key,
-       this.valueOnChange,
-       this.currentValue,
-       required this.title,
-       this.minValue,
-       this.maxValue,
-       bool? disabled})
+      this.valueOnChange,
+      this.currentValue,
+      required this.title,
+      this.minValue,
+      this.maxValue,
+      bool? disabled})
       : this.divisions = maxValue! - minValue!,
         this.disabled = disabled ?? false,
         super(key: key);
