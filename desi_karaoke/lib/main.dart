@@ -5,7 +5,8 @@ import 'package:connectivity/connectivity.dart';
 import 'package:desi_karaoke_lite/KaraokePage.dart';
 import 'package:desi_karaoke_lite/LoginScreen.dart';
 import 'package:desi_karaoke_lite/widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    hide PhoneAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,12 +17,35 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
+import 'package:firebase_auth/firebase_auth.dart'
+    hide PhoneAuthProvider;
 
 import 'models.dart';
 
 const NO_CONNECTION = "No Connection";
 const CONNECTION_TIMEOUT = "Connection timed out";
+const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
 
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+//   FirebaseUIAuth.configureProviders([
+//     PhoneAuthProvider(),
+//     GoogleProvider(clientId: GOOGLE_CLIENT_ID),
+//   ]);
+//   SystemChrome.setPreferredOrientations([
+//     DeviceOrientation.portraitUp,
+//     DeviceOrientation.portraitDown,
+//   ]).then((_) async {
+//     await Firebase.initializeApp();
+//     runApp(MyApp());
+//   });
+//   // runApp(MyApp());
+// }
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
