@@ -7,6 +7,7 @@ import 'package:flutter_signin_button/button_builder.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 class LoginScreen extends StatelessWidget {
   static const MethodChannel _channel = const MethodChannel('firebase_auth_ui');
@@ -64,19 +65,22 @@ class _LoginPageState extends State<LoginPage> {
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
-                // SignInButton(
-                //   Buttons.Google,
-                //   onPressed: () {
-                //     _handleSignIn();
-                //   }, // default: false
-                // ),
-                // SignInButtonBuilder(
-                //   text: "Sign In with Phone",
-                //   backgroundColor: Colors.blueGrey[700],
-                //   onPressed: () {},
-                //   icon: Icons.phone,
-                // ),
-                ElevatedButton(child: Text("Get Started"),onPressed: launchNativeSignInUi,)
+                SignInButton(
+                  Buttons.Google,
+                  onPressed: () {
+                    _handleSignIn;
+                  }, // default: false
+                ),
+                SignInButtonBuilder(
+                  text: "Sign In with Phone",
+                  backgroundColor: Colors.blueGrey[700]!,
+                  onPressed: () {},
+                  icon: Icons.phone,
+                ),
+                ElevatedButton(
+                  child: Text("Get Started"),
+                  onPressed: launchNativeSignInUi,
+                )
               ],
             ),
             Spacer(
@@ -89,18 +93,19 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _handleSignIn(user) async {
-    // final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-    // final GoogleSignInAuthentication googleAuth =
-    //     await googleUser.authentication;
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
 
-    // final AuthCredential credential = GoogleAuthProvider.getCredential(
-    //   accessToken: googleAuth.accessToken,
-    //   idToken: googleAuth.idToken,
-    // );
 
-    // final User user = (await _auth.signInWithCredential(credential)).user;
-    // print(user.uid);
-    userRef = FirebaseDatabase.instance.ref().child("users/${user.uid}");
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    final user = (await FirebaseAuth.instance.signInWithCredential(credential)).user;
+    print(user?.uid);
+    userRef = FirebaseDatabase.instance.ref().child("users/${user?.uid}");
 
     userRef.once().then((data) {
       if (data.snapshot.value == null) {
@@ -193,30 +198,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   launchNativeSignInUi() {
+    FirebaseAuthUi.instance().launchAuth([
+      // AuthProvider.email(),
+      // Google ,facebook, twitter and phone auth providers are commented because this example
+      // isn't configured to enable them. Please follow the README and uncomment
+      // them if you want to integrate them in your project.
 
-    /*FirebaseAuthUi.instance().launchAuth([
-          // AuthProvider.email(),
-          // Google ,facebook, twitter and phone auth providers are commented because this example
-          // isn't configured to enable them. Please follow the README and uncomment
-          // them if you want to integrate them in your project.
-
-          AuthProvider.google(),
-          // AuthProvider.facebook(),
-          // AuthProvider.twitter(),
-          AuthProvider.phone(),
-        ]).then((firebaseUser) {
-          _handleSignIn(firebaseUser);
-          
-        }).catchError((error) {
-          if (error is PlatformException) {
-            setState(() {
-              if (error.code == FirebaseAuthUi.kUserCancelledError) {
-                // _error = "User cancelled login";
-              } else {
-                // _error = error.message ?? "Unknown error!";
-              }
-            });
+      AuthProvider.google(),
+      // AuthProvider.facebook(),
+      // AuthProvider.twitter(),
+      AuthProvider.phone(),
+    ]).then((firebaseUser) {
+      _handleSignIn(firebaseUser);
+    }).catchError((error) {
+      if (error is PlatformException) {
+        setState(() {
+          if (error.code == FirebaseAuthUi.kUserCancelledError) {
+            // _error = "User cancelled login";
+          } else {
+            // _error = error.message ?? "Unknown error!";
           }
-        });*/
+        });
+      }
+    });
   }
 }
