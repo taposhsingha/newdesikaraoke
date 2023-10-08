@@ -5,8 +5,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:desi_karaoke_lite/KaraokePage.dart';
 import 'package:desi_karaoke_lite/LoginScreen.dart';
 import 'package:desi_karaoke_lite/widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide PhoneAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart'hide PhoneAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -52,7 +51,10 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) async {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+     FirebaseUIAuth.configureProviders([
+      GoogleProvider(clientId: GOOGLE_CLIENT_ID),
+    ]);
     runApp(MyApp());
   });
   // runApp(MyApp());

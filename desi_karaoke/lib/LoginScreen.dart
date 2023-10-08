@@ -259,18 +259,18 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _handleSignIn(user) async {
+  void _handleSignIn() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication? googleAuth =
         await googleUser?.authentication;
-
 
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth?.accessToken,
       idToken: googleAuth?.idToken,
     );
 
-    final user = (await FirebaseAuth.instance.signInWithCredential(credential)).user;
+    final user =
+        (await FirebaseAuth.instance.signInWithCredential(credential)).user;
     print(user?.uid);
     userRef = FirebaseDatabase.instance.ref().child("users/${user?.uid}");
 
@@ -365,29 +365,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   launchNativeSignInUi() {
-    FirebaseAuthUi.instance().launchAuth([
-      // AuthProvider.email(),
-      // Google ,facebook, twitter and phone auth providers are commented because this example
-      // isn't configured to enable them. Please follow the README and uncomment
-      // them if you want to integrate them in your project.
+    // FirebaseAuthUi.instance().launchAuth([
+    //   // AuthProvider.email(),
+    //   // Google ,facebook, twitter and phone auth providers are commented because this example
+    //   // isn't configured to enable them. Please follow the README and uncomment
+    //   // them if you want to integrate them in your project.
 
-      AuthProvider.google(),
-      // AuthProvider.facebook(),
-      // AuthProvider.twitter(),
-      AuthProvider.phone(),
-    ]).then((firebaseUser) {
-      _handleSignIn(firebaseUser);
-    }).catchError((error) {
-      if (error is PlatformException) {
-        setState(() {
-          if (error.code == FirebaseAuthUi.kUserCancelledError) {
-            // _error = "User cancelled login";
-          } else {
-            // _error = error.message ?? "Unknown error!";
-          }
-        });
-      }
-    });
+    //   AuthProvider.google(),
+    //   // AuthProvider.facebook(),
+    //   // AuthProvider.twitter(),
+    //   AuthProvider.phone(),
+    // ]).then((firebaseUser) {
+    //   _handleSignIn(firebaseUser);
+    // }).catchError((error) {
+    //   if (error is PlatformException) {
+    //     setState(() {
+    //       if (error.code == FirebaseAuthUi.kUserCancelledError) {
+    //         // _error = "User cancelled login";
+    //       } else {
+    //         // _error = error.message ?? "Unknown error!";
+    //       }
+    //     });
+    //   }
+    // });
   }
-
 }
