@@ -1,5 +1,6 @@
 import 'package:desi_karaoke_lite/main.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart'
+    hide PhoneAuthProvider;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,22 +16,7 @@ import 'firebase_options.dart';
 
 const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  FirebaseUIAuth.configureProviders([
-    PhoneAuthProvider(),
-    GoogleProvider(clientId: GOOGLE_CLIENT_ID),
-  ]);
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]).then((_) async {
-    await Firebase.initializeApp();
-    //runApp(const FirebaseAuthUIExample());
-  });
-  // runApp(MyApp());
-}
+
 
 
 
@@ -56,7 +42,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-/*class FirebaseAuthUIExample extends StatelessWidget {
+class FirebaseAuthUIExample extends StatelessWidget {
   const FirebaseAuthUIExample({super.key});
 
   String get initialRoute {
@@ -221,7 +207,42 @@ class LoginPage extends StatefulWidget {
       },
     );
   }
-}*/
+}
+
+/*
+class LoginSignUp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final providers = [PhoneAuthProvider()];
+
+    return MaterialApp(
+      initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/profile',
+      routes: {
+        '/sign-in': (context) {
+          return SignInScreen(
+            providers: providers,
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.pushReplacementNamed(context, '/profile');
+              }),
+            ],
+          );
+        },
+        '/profile': (context) {
+          return ProfileScreen(
+            providers: providers,
+            actions: [
+              SignedOutAction((context) {
+                Navigator.pushReplacementNamed(context, '/sign-in');
+              }),
+            ],
+          );
+        },
+      },
+    );
+  }
+}
+*/
 
 class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -230,6 +251,8 @@ class _LoginPageState extends State<LoginPage> {
   var nameEditingController = TextEditingController();
   var globalKey = GlobalKey<FormState>();
   late DatabaseReference userRef;
+  bool showCustomWidget = false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -257,6 +280,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                 ),
+
                 // SignInButton(
                 //   Buttons.Google,
                 //   onPressed: () {
@@ -269,7 +293,9 @@ class _LoginPageState extends State<LoginPage> {
                 //   onPressed: () {},
                 //   icon: Icons.phone,
                 // ),
-                ElevatedButton(child: Text("Get Started"),onPressed: launchNativeSignInUi,)
+                ElevatedButton(child: Text("Get Started"),onPressed: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>FirebaseAuthUIExample()),);
+                },)
               ],
             ),
             Spacer(
@@ -385,7 +411,7 @@ class _LoginPageState extends State<LoginPage> {
     }*/
   }
 
-  launchNativeSignInUi() {
+  void launchNativeSignInUi() {
 
     /*FirebaseAuthUi.instance().launchAuth([
           // AuthProvider.email(),

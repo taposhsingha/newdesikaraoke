@@ -30,24 +30,13 @@ const NO_CONNECTION = "No Connection";
 const CONNECTION_TIMEOUT = "Connection timed out";
 const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
 
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-//   FirebaseUIAuth.configureProviders([
-//     PhoneAuthProvider(),
-//     GoogleProvider(clientId: GOOGLE_CLIENT_ID),
-//   ]);
-//   SystemChrome.setPreferredOrientations([
-//     DeviceOrientation.portraitUp,
-//     DeviceOrientation.portraitDown,
-//   ]).then((_) async {
-//     await Firebase.initializeApp();
-//     runApp(MyApp());
-//   });
-//   // runApp(MyApp());
-// }
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseUIAuth.configureProviders([
+    PhoneAuthProvider(),
+    GoogleProvider(clientId: GOOGLE_CLIENT_ID),
+  ]);
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -57,6 +46,17 @@ void main() {
   });
   // runApp(MyApp());
 }
+/*void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) async {
+    await Firebase.initializeApp();
+    runApp(MyApp());
+  });
+  // runApp(MyApp());
+}*/
 
 class ConnectivityException implements Exception {
   String code;
