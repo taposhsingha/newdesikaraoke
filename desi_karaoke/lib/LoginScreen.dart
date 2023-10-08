@@ -1,5 +1,5 @@
 import 'package:desi_karaoke_lite/main.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,6 +7,32 @@ import 'package:flutter_signin_button/button_builder.dart';
 import 'package:flutter_signin_button/button_view.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
+import 'package:flutter/material.dart';
+import 'firebase_options.dart';
+
+const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseUIAuth.configureProviders([
+    PhoneAuthProvider(),
+    GoogleProvider(clientId: GOOGLE_CLIENT_ID),
+  ]);
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) async {
+    await Firebase.initializeApp();
+    //runApp(const FirebaseAuthUIExample());
+  });
+  // runApp(MyApp());
+}
+
+
 
 class LoginScreen extends StatelessWidget {
   static const MethodChannel _channel = const MethodChannel('firebase_auth_ui');
@@ -29,6 +55,173 @@ class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
+
+/*class FirebaseAuthUIExample extends StatelessWidget {
+  const FirebaseAuthUIExample({super.key});
+
+  String get initialRoute {
+    final user = FirebaseAuth.instance.currentUser;
+
+    return switch (user) {
+      null => '/',
+      User(emailVerified: false, email: final String _) => '/verify-email',
+      _ => '/profile',
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final buttonStyle = ButtonStyle(
+      padding: MaterialStateProperty.all(const EdgeInsets.all(12)),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+
+    final mfaAction = AuthStateChangeAction<MFARequired>(
+          (context, state) async {
+        final nav = Navigator.of(context);
+
+        await startMFAVerification(
+          resolver: state.resolver,
+          context: context,
+        );
+
+        nav.pushReplacementNamed('/profile');
+      },
+    );
+
+    return MaterialApp(
+      theme: ThemeData(
+        brightness: Brightness.light,
+        visualDensity: VisualDensity.standard,
+        useMaterial3: true,
+        inputDecorationTheme: const InputDecorationTheme(
+          border: OutlineInputBorder(),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
+        textButtonTheme: TextButtonThemeData(style: buttonStyle),
+        outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
+      ),
+      initialRoute: initialRoute,
+      routes: {
+        '/': (context) {
+          return SignInScreen(
+            actions: [
+              ForgotPasswordAction((context, email) {
+                Navigator.pushNamed(
+                  context,
+                  '/forgot-password',
+                  arguments: {'email': email},
+                );
+              }),
+              VerifyPhoneAction((context, _) {
+                Navigator.pushNamed(context, '/phone');
+              }),
+              AuthStateChangeAction((context, state) {
+                final user = switch (state) {
+                  SignedIn(user: final user) => user,
+                  CredentialLinked(user: final user) => user,
+                  UserCreated(credential: final cred) => cred.user,
+                  _ => null,
+                };
+
+                switch (user) {
+                  case User(emailVerified: true):
+                    Navigator.pushReplacementNamed(context, '/profile');
+                  case User(emailVerified: false, email: final String _):
+                    Navigator.pushNamed(context, '/verify-email');
+                }
+              }),
+              mfaAction,
+              EmailLinkSignInAction((context) {
+                Navigator.pushReplacementNamed(context, '/email-link-sign-in');
+              }),
+            ],
+            styles: const {
+              EmailFormStyle(signInButtonVariant: ButtonVariant.filled),
+            },
+
+            subtitleBuilder: (context, action) {
+              final actionText = switch (action) {
+                AuthAction.signIn => 'Please sign in to continue.',
+                AuthAction.signUp => 'Please create an account to continue',
+                _ => throw Exception('Invalid action: $action'),
+              };
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Text('Welcome to Firebase UI! $actionText.'),
+              );
+            },
+            footerBuilder: (context, action) {
+              final actionText = switch (action) {
+                AuthAction.signIn => 'signing in',
+                AuthAction.signUp => 'registering',
+                _ => throw Exception('Invalid action: $action'),
+              };
+
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'By $actionText, you agree to our terms and conditions.',
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        '/verify-email': (context) {
+          return EmailVerificationScreen(
+            actions: [
+              EmailVerifiedAction(() {
+                Navigator.pushReplacementNamed(context, '/profile');
+              }),
+              AuthCancelledAction((context) {
+                FirebaseUIAuth.signOut(context: context);
+                Navigator.pushReplacementNamed(context, '/');
+              }),
+            ],
+          );
+        },
+        '/phone': (context) {
+          return PhoneInputScreen(
+            actions: [
+              SMSCodeRequestedAction((context, action, flowKey, phone) {
+                Navigator.of(context).pushReplacementNamed(
+                  '/sms',
+                  arguments: {
+                    'action': action,
+                    'flowKey': flowKey,
+                    'phone': phone,
+                  },
+                );
+              }),
+            ],
+          );
+        },
+        '/sms': (context) {
+          final arguments = ModalRoute.of(context)?.settings.arguments
+          as Map<String, dynamic>?;
+
+          return SMSCodeInputScreen(
+            actions: [
+              AuthStateChangeAction<SignedIn>((context, state) {
+                Navigator.of(context).pushReplacementNamed('/profile');
+              })
+            ],
+            flowKey: arguments?['flowKey'],
+            action: arguments?['action'],
+
+          );
+        },
+
+      },
+    );
+  }
+}*/
 
 class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -219,4 +412,5 @@ class _LoginPageState extends State<LoginPage> {
           }
         });*/
   }
+
 }

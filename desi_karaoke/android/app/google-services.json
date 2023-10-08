@@ -43,7 +43,8 @@
               "client_id": "837759484127-13s6a8hn77l11dcpi4d044ft7lclqirc.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.desikaraoke.singalong"
+                "bundle_id": "com.desikaraoke.singalong",
+                "app_store_id": "1484782908"
               }
             }
           ]
@@ -67,11 +68,11 @@
           }
         },
         {
-          "client_id": "837759484127-vnf0mnqc4cbhu7pafiuv1u115ge7ct4p.apps.googleusercontent.com",
+          "client_id": "837759484127-pe9u20p865dgj9o2vv7bnv702ahigj8i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.desikaraoke.lite",
-            "certificate_hash": "4ba4e93d3e2ca972c9bc2d2eb7a8f383dd2690fa"
+            "certificate_hash": "57c7bc57dcef52400932de34dfe7e2eabc81fb91"
           }
         },
         {
@@ -83,11 +84,11 @@
           }
         },
         {
-          "client_id": "837759484127-pe9u20p865dgj9o2vv7bnv702ahigj8i.apps.googleusercontent.com",
+          "client_id": "837759484127-vnf0mnqc4cbhu7pafiuv1u115ge7ct4p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.desikaraoke.lite",
-            "certificate_hash": "57c7bc57dcef52400932de34dfe7e2eabc81fb91"
+            "certificate_hash": "4ba4e93d3e2ca972c9bc2d2eb7a8f383dd2690fa"
           }
         },
         {
@@ -111,7 +112,8 @@
               "client_id": "837759484127-13s6a8hn77l11dcpi4d044ft7lclqirc.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.desikaraoke.singalong"
+                "bundle_id": "com.desikaraoke.singalong",
+                "app_store_id": "1484782908"
               }
             }
           ]
@@ -147,7 +149,8 @@
               "client_id": "837759484127-13s6a8hn77l11dcpi4d044ft7lclqirc.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.desikaraoke.singalong"
+                "bundle_id": "com.desikaraoke.singalong",
+                "app_store_id": "1484782908"
               }
             }
           ]
@@ -162,6 +165,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "837759484127-0r1nmspbek263sia28hhnf2hrh9edhbk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.desikaraoke.singalong",
+            "certificate_hash": "6636d68215858c153d987e929506e3c094f09ee4"
+          }
+        },
         {
           "client_id": "837759484127-cq4lhm7nth42dc34clqa705rboc0352b.apps.googleusercontent.com",
           "client_type": 1,
@@ -187,14 +198,6 @@
           }
         },
         {
-          "client_id": "837759484127-0r1nmspbek263sia28hhnf2hrh9edhbk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.desikaraoke.singalong",
-            "certificate_hash": "6636d68215858c153d987e929506e3c094f09ee4"
-          }
-        },
-        {
           "client_id": "837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -215,7 +218,8 @@
               "client_id": "837759484127-13s6a8hn77l11dcpi4d044ft7lclqirc.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.desikaraoke.singalong"
+                "bundle_id": "com.desikaraoke.singalong",
+                "app_store_id": "1484782908"
               }
             }
           ]

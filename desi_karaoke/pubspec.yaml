@@ -31,6 +31,7 @@ dependencies:
   auth_buttons: ^3.0.2
   flutter_signin_button: ^2.0.0
   firebase_ui_auth: ^1.8.0
+  firebase_ui_oauth_google: ^1.2.11
   charset: ^2.0.1
   flutter_audio_engine:
     path: ../flutter_audio_engine/
