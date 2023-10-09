@@ -43,7 +43,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class FirebaseAuthUIExample extends StatelessWidget {
-  const FirebaseAuthUIExample({super.key});
+   FirebaseAuthUIExample({super.key});
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  var nameEditingController = TextEditingController();
+  var globalKey = GlobalKey<FormState>();
+  late DatabaseReference userRef;
+  bool showCustomWidget = false;
+
 
   String get initialRoute {
     final user = FirebaseAuth.instance.currentUser;
@@ -54,6 +62,8 @@ class FirebaseAuthUIExample extends StatelessWidget {
       _ => '/profile',
     };
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -207,42 +217,15 @@ class FirebaseAuthUIExample extends StatelessWidget {
       },
     );
   }
+
+
+
+
 }
 
-/*
-class LoginSignUp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final providers = [PhoneAuthProvider()];
 
-    return MaterialApp(
-      initialRoute: FirebaseAuth.instance.currentUser == null ? '/sign-in' : '/profile',
-      routes: {
-        '/sign-in': (context) {
-          return SignInScreen(
-            providers: providers,
-            actions: [
-              AuthStateChangeAction<SignedIn>((context, state) {
-                Navigator.pushReplacementNamed(context, '/profile');
-              }),
-            ],
-          );
-        },
-        '/profile': (context) {
-          return ProfileScreen(
-            providers: providers,
-            actions: [
-              SignedOutAction((context) {
-                Navigator.pushReplacementNamed(context, '/sign-in');
-              }),
-            ],
-          );
-        },
-      },
-    );
-  }
-}
-*/
+
+
 
 class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -440,3 +423,4 @@ class _LoginPageState extends State<LoginPage> {
   }
 
 }
+
