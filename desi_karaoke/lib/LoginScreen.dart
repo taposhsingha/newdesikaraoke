@@ -1,6 +1,5 @@
 import 'package:desi_karaoke_lite/main.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide PhoneAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,11 +12,8 @@ import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 
-const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
-
-
-
-
+const GOOGLE_CLIENT_ID =
+    '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
 
 class LoginScreen extends StatelessWidget {
   static const MethodChannel _channel = const MethodChannel('firebase_auth_ui');
@@ -42,7 +38,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class FirebaseAuthUIExample extends StatelessWidget {
-   FirebaseAuthUIExample({super.key});
+  FirebaseAuthUIExample({super.key});
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -50,7 +46,6 @@ class FirebaseAuthUIExample extends StatelessWidget {
   var globalKey = GlobalKey<FormState>();
   late DatabaseReference userRef;
   bool showCustomWidget = false;
-
 
   String get initialRoute {
     final user = FirebaseAuth.instance.currentUser;
@@ -62,8 +57,6 @@ class FirebaseAuthUIExample extends StatelessWidget {
     };
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final buttonStyle = ButtonStyle(
@@ -74,7 +67,7 @@ class FirebaseAuthUIExample extends StatelessWidget {
     );
 
     final mfaAction = AuthStateChangeAction<MFARequired>(
-          (context, state) async {
+      (context, state) async {
         final nav = Navigator.of(context);
 
         await startMFAVerification(
@@ -136,7 +129,6 @@ class FirebaseAuthUIExample extends StatelessWidget {
             styles: const {
               EmailFormStyle(signInButtonVariant: ButtonVariant.filled),
             },
-
             subtitleBuilder: (context, action) {
               final actionText = switch (action) {
                 AuthAction.signIn => 'Please sign in to continue.',
@@ -199,7 +191,7 @@ class FirebaseAuthUIExample extends StatelessWidget {
         },
         '/sms': (context) {
           final arguments = ModalRoute.of(context)?.settings.arguments
-          as Map<String, dynamic>?;
+              as Map<String, dynamic>?;
 
           return SMSCodeInputScreen(
             actions: [
@@ -209,22 +201,17 @@ class FirebaseAuthUIExample extends StatelessWidget {
             ],
             flowKey: arguments?['flowKey'],
             action: arguments?['action'],
-
           );
         },
+        '/profile': (context) {
+          final platform = Theme.of(context).platform;
 
+          return HomePage();
+        },
       },
     );
   }
-
-
-
-
 }
-
-
-
-
 
 class _LoginPageState extends State<LoginPage> {
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -234,7 +221,6 @@ class _LoginPageState extends State<LoginPage> {
   var globalKey = GlobalKey<FormState>();
   late DatabaseReference userRef;
   bool showCustomWidget = false;
-
 
   @override
   Widget build(BuildContext context) {
@@ -275,9 +261,16 @@ class _LoginPageState extends State<LoginPage> {
                 //   onPressed: () {},
                 //   icon: Icons.phone,
                 // ),
-                ElevatedButton(child: Text("Get Started"),onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>FirebaseAuthUIExample()),);
-                },)
+                ElevatedButton(
+                  child: Text("Get Started"),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FirebaseAuthUIExample()),
+                    );
+                  },
+                )
               ],
             ),
             Spacer(
@@ -394,7 +387,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void launchNativeSignInUi() {
-
     /*FirebaseAuthUi.instance().launchAuth([
           // AuthProvider.email(),
           // Google ,facebook, twitter and phone auth providers are commented because this example
@@ -421,4 +413,3 @@ class _LoginPageState extends State<LoginPage> {
         });*/
   }
 }
-

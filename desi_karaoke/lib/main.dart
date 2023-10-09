@@ -5,8 +5,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:desi_karaoke_lite/KaraokePage.dart';
 import 'package:desi_karaoke_lite/LoginScreen.dart';
 import 'package:desi_karaoke_lite/widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide PhoneAuthProvider;
+import 'package:firebase_auth/firebase_auth.dart' hide PhoneAuthProvider;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,17 +17,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:upgrader/upgrader.dart';
 import 'firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
-import 'package:firebase_auth/firebase_auth.dart'
-    hide PhoneAuthProvider;
-
 import 'models.dart';
 
 const NO_CONNECTION = "No Connection";
 const CONNECTION_TIMEOUT = "Connection timed out";
-const GOOGLE_CLIENT_ID = '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID =
+    '837759484127-orc1b2i495rq62s4i1gab2dfjblcbetp.apps.googleusercontent.com';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -100,7 +96,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = NavigationItem.home.index;
-   String? _selectedItem;
+  String? _selectedItem;
 
   late SearchDelegate _searchDelegate;
 
@@ -234,7 +230,8 @@ class _HomePageState extends State<HomePage> {
             icon: (_selectedIndex == NavigationItem.favorite.index)
                 ? Icon(CupertinoIcons.heart_solid, color: Colors.redAccent)
                 : Icon(CupertinoIcons.heart),
-            label:'Favorites',),
+            label: 'Favorites',
+          ),
           BottomNavigationBarItem(
             icon: (_selectedIndex == NavigationItem.genre.index)
                 ? Icon(CupertinoIcons.collections_solid)
@@ -272,31 +269,32 @@ class _HomePageState extends State<HomePage> {
           .timeout(Duration(seconds: 30),
               onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
           .then((DataSnapshot data) async {
-        if (prefs == null) {
-          prefs = await SharedPreferences.getInstance();
-        }
-        favoriteKeyList =
-            prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
-                List<String>.empty();
-        List<Music> list = new List.empty();
-        if (favoriteKeyList != null) {
-          favoriteMusic.clear();
-        }
-        Map<dynamic, dynamic> musicData = data.value as Map<dynamic, dynamic>;
-        musicData.forEach(
-          (key, value) {
-            Music music = Music.fromMap(value);
-            music.key = key;
-            if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
-              music.isFavorite = true;
+            if (prefs == null) {
+              prefs = await SharedPreferences.getInstance();
             }
-            list.add(music);
-          },
-        );
-        items.clear();
-        items.addAll(list);
-        items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
-      } as FutureOr Function(DatabaseEvent value));
+            favoriteKeyList =
+                prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
+                    List<String>.empty();
+            List<Music> list = new List.empty();
+            if (favoriteKeyList != null) {
+              favoriteMusic.clear();
+            }
+            Map<dynamic, dynamic> musicData =
+                data.value as Map<dynamic, dynamic>;
+            musicData.forEach(
+              (key, value) {
+                Music music = Music.fromMap(value);
+                music.key = key;
+                if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+                  music.isFavorite = true;
+                }
+                list.add(music);
+              },
+            );
+            items.clear();
+            items.addAll(list);
+            items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
+          } as FutureOr Function(DatabaseEvent value));
     }
   }
 
@@ -623,7 +621,8 @@ class _HomePageState extends State<HomePage> {
                         songRequestData['user_id'] =
                             FirebaseAuth.instance.currentUser?.uid ?? "";
                         songRequestData['user_name'] =
-                            FirebaseAuth.instance.currentUser?.displayName ?? "";
+                            FirebaseAuth.instance.currentUser?.displayName ??
+                                "";
                         songRequestData['user_contact'] =
                             FirebaseAuth.instance.currentUser?.email ?? "";
                         songRequestRef?.set(songRequestData)?.whenComplete(() {
@@ -691,7 +690,8 @@ class _HomePageState extends State<HomePage> {
                         feedbackData['user_id'] =
                             FirebaseAuth.instance.currentUser?.uid ?? "";
                         feedbackData['user_name'] =
-                            FirebaseAuth.instance.currentUser?.displayName ?? "";
+                            FirebaseAuth.instance.currentUser?.displayName ??
+                                "";
                         feedbackData['user_contact'] =
                             FirebaseAuth.instance.currentUser?.email ?? "";
                         feedbackRef.set(feedbackData).whenComplete(() {
