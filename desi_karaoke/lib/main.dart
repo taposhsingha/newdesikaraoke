@@ -100,9 +100,9 @@ class _HomePageState extends State<HomePage> {
 
   late SearchDelegate _searchDelegate;
 
-  List<Music> items = List.empty();
-  List<Music> favoriteMusic = List.empty();
-  late List<String> favoriteKeyList;
+  List<Music> items = List.empty(growable: true);
+  List<Music> favoriteMusic = List.empty(growable: true);
+   List<String> favoriteKeyList = List.empty(growable: true);
 
   late SharedPreferences prefs;
   static const TextStyle optionStyle =
@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text(LocStr.of(context)!.helloWorld));
                 } else {
-                  print(snapshot.error);
+                  print(snapshot);
                   return InkWell(
                       onTap: () {
                         setState(() {});
@@ -275,13 +275,11 @@ class _HomePageState extends State<HomePage> {
         prefs = await SharedPreferences.getInstance();
         favoriteKeyList = prefs.getStringList(SharedPreferencesKeys.FAVORITES) ?? List<String>.empty();
         List<Music> list = <Music>[];
-        if (favoriteKeyList != null) {
-          favoriteMusic.clear();
-        }
-        (event.snapshot.value as Map).forEach((key, value) {
+        favoriteMusic.clear();
+              (event.snapshot.value as Map).forEach((key, value) {
           Music music = Music.fromMap(value);
           music.key = key;
-          if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+          if (favoriteKeyList.contains(key)) {
             music.isFavorite = true;
           }
           list.add(music);
@@ -582,7 +580,7 @@ class _HomePageState extends State<HomePage> {
     if (cleanQuery.length < 3) {
       items.forEach((item) {
         if (item.artist.toLowerCase().startsWith(cleanQuery) ||
-            (item.banglaartist?.startsWith(cleanQuery) ?? false) ||
+            (item.banglaartist.startsWith(cleanQuery) ?? false) ||
             item.title.toLowerCase().startsWith(cleanQuery) ||
             item.banglatitle.startsWith(cleanQuery)) {
           list.add(item);
@@ -592,7 +590,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       items.forEach((item) {
         if (item.artist.toLowerCase().contains(cleanQuery) ||
-            (item.banglaartist?.contains(cleanQuery) ?? false) ||
+            (item.banglaartist.contains(cleanQuery) ?? false) ||
             item.title.toLowerCase().contains(cleanQuery) ||
             item.banglatitle.contains(cleanQuery)) {
           list.add(item);
@@ -616,7 +614,7 @@ class _HomePageState extends State<HomePage> {
       rank = music.banglatitle.indexOf(cleanQuery);
     } else if (music.artist.toLowerCase().contains(cleanQuery)) {
       rank = music.artist.toLowerCase().indexOf(cleanQuery) + 3;
-    } else if ((music.banglaartist?.contains(cleanQuery) ?? false)) {
+    } else if ((music.banglaartist.contains(cleanQuery) ?? false)) {
       rank = music.banglaartist.indexOf(cleanQuery) + 3;
     } else if (music.title.toLowerCase().contains(cleanQuery)) {
       rank = music.title.toLowerCase().indexOf(cleanQuery);

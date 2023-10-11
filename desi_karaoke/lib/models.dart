@@ -1,5 +1,19 @@
 class Music {
-  late String artist;
+   String artist="";
+  String banglaartist = "";
+  String banglatitle = "";
+   String effectivetitle="";
+   String effectiveartist="";
+   String genre="";
+   String language="";
+   int lyricoffset=-1;
+   String lyricref="";
+   String storagepath="";
+   String title="";
+   String trial="";
+   String key="";
+  bool isFavorite = false;
+  /*late String artist;
   String banglaartist = "";
   String banglatitle = "";
   late String effectivetitle;
@@ -12,12 +26,13 @@ class Music {
   late String title;
   late String trial;
   late String key;
-  bool isFavorite = false;
+  bool isFavorite = false;*/
 
   Music.fromMap(Map<dynamic, dynamic> data) {
     artist = data['artist'];
     banglatitle = data['banglatitle'];
-    banglaartist = data['banglaartist'];
+    /*banglaartist = data['banglaartist'];*/
+    banglaartist = data['banglaartist'] ?? '';
     genre = data['genre'];
     language = data['language'];
     lyricoffset = data['lyricoffset'];
@@ -25,12 +40,15 @@ class Music {
     storagepath = data['storagepath'];
     title = data['title'];
     trial = data['trial'];
-    effectivetitle =
-        banglatitle == null || banglatitle == "" ? title : banglatitle;
-    effectiveartist =
-        banglaartist == null || banglaartist == "" ? artist : banglaartist;
-  }
 
+    /*effectivetitle =
+        banglatitle == "" ? title : banglatitle;*/
+    effectiveartist =
+        banglaartist == "" ? artist : banglaartist;
+  }
+   String get effectiveTitle {
+     return banglatitle ?? title;
+   }
   @override
   String toString() {
     return effectivetitle;
@@ -61,9 +79,12 @@ class SharedPreferencesKeys {
 }
 
 class Artist implements Comparable<Artist> {
-  late String artist;
+   String artist="";
+   String effectiveartist="";
+   String banglaartist="";
+  /*late String artist;
   late String effectiveartist;
-  late String banglaartist;
+  late String banglaartist;*/
 
   Artist(this.artist, this.banglaartist, this.effectiveartist);
 
