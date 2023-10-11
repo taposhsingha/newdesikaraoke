@@ -100,9 +100,9 @@ class _HomePageState extends State<HomePage> {
 
   late SearchDelegate _searchDelegate;
 
-  List<Music> items = List.empty();
-  List<Music> favoriteMusic = List.empty();
-  late List<String> favoriteKeyList;
+  List<Music> items = List.empty(growable: true);
+  List<Music> favoriteMusic = List.empty(growable: true);
+  List<String> favoriteKeyList = List.empty(growable: true);
 
   late SharedPreferences prefs;
   static const TextStyle optionStyle =
@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _selectedItem = null;
+      _selectedItem;
     });
   }
 
@@ -260,28 +260,29 @@ class _HomePageState extends State<HomePage> {
     if (items.isNotEmpty) {
       return;
     } else {
-      DatabaseReference musicDataRef = FirebaseDatabase.instance.reference().child("music");
+      DatabaseReference musicDataRef =
+          FirebaseDatabase.instance.ref().child("music");
       FirebaseDatabase.instance.setPersistenceEnabled(true);
       FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
       musicDataRef.keepSynced(true);
       await musicDataRef
           .once()
           .timeout(Duration(seconds: 30),
-          onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
+              onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
           .then((DatabaseEvent event) async {
         /*if (prefs == null) {
           prefs = await SharedPreferences.getInstance();
         }*/
         prefs = await SharedPreferences.getInstance();
-        favoriteKeyList = prefs.getStringList(SharedPreferencesKeys.FAVORITES) ?? List<String>.empty();
+        favoriteKeyList =
+            prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
+                List<String>.empty(growable: true);
         List<Music> list = <Music>[];
-        if (favoriteKeyList != null) {
-          favoriteMusic.clear();
-        }
+        favoriteMusic.clear();
         (event.snapshot.value as Map).forEach((key, value) {
           Music music = Music.fromMap(value);
           music.key = key;
-          if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+          if (favoriteKeyList.contains(key)) {
             music.isFavorite = true;
           }
           list.add(music);
@@ -293,7 +294,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
- /* Future buildThen() async {
+  /* Future buildThen() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       throw ConnectivityException(NO_CONNECTION);
@@ -366,8 +367,8 @@ class _HomePageState extends State<HomePage> {
             if (favoriteKeyList != null) {
               favoriteMusic.clear();
             }
-            *//*Map<dynamic, dynamic> musicData =
-            data.value as Map<dynamic, dynamic>;*//*
+            */ /*Map<dynamic, dynamic> musicData =
+            data.value as Map<dynamic, dynamic>;*/ /*
             Map<String, dynamic> musicData = data.value as Map<String, dynamic>;
             musicData.forEach(
                   (key, value) {
@@ -379,7 +380,7 @@ class _HomePageState extends State<HomePage> {
                 list.add(music);
               },
             );
-            *//*Map<dynamic, dynamic> musicData =
+            */ /*Map<dynamic, dynamic> musicData =
                 data.value as Map<dynamic, dynamic>;
             musicData.forEach(
               (key, value) {
@@ -390,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                 }
                 list.add(music);
               },
-            );*//*
+            );*/ /*
             items.clear();
             items.addAll(list);
             items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
@@ -552,7 +553,8 @@ class _HomePageState extends State<HomePage> {
         );
       }
     } else if (_selectedIndex == NavigationItem.favorite.index) {
-      var list = items.where((music) => music.isFavorite).toList();
+      var list =
+          items.where((music) => music.isFavorite).toList(growable: true);
       if (filter != null) {
         list = filterAndSort(list, filter);
       }
@@ -582,7 +584,7 @@ class _HomePageState extends State<HomePage> {
     if (cleanQuery.length < 3) {
       items.forEach((item) {
         if (item.artist.toLowerCase().startsWith(cleanQuery) ||
-            (item.banglaartist?.startsWith(cleanQuery) ?? false) ||
+            (item.banglaartist.startsWith(cleanQuery) ?? false) ||
             item.title.toLowerCase().startsWith(cleanQuery) ||
             item.banglatitle.startsWith(cleanQuery)) {
           list.add(item);
@@ -592,7 +594,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       items.forEach((item) {
         if (item.artist.toLowerCase().contains(cleanQuery) ||
-            (item.banglaartist?.contains(cleanQuery) ?? false) ||
+            (item.banglaartist.contains(cleanQuery) ?? false) ||
             item.title.toLowerCase().contains(cleanQuery) ||
             item.banglatitle.contains(cleanQuery)) {
           list.add(item);
@@ -616,7 +618,7 @@ class _HomePageState extends State<HomePage> {
       rank = music.banglatitle.indexOf(cleanQuery);
     } else if (music.artist.toLowerCase().contains(cleanQuery)) {
       rank = music.artist.toLowerCase().indexOf(cleanQuery) + 3;
-    } else if ((music.banglaartist?.contains(cleanQuery) ?? false)) {
+    } else if ((music.banglaartist.contains(cleanQuery) ?? false)) {
       rank = music.banglaartist.indexOf(cleanQuery) + 3;
     } else if (music.title.toLowerCase().contains(cleanQuery)) {
       rank = music.title.toLowerCase().indexOf(cleanQuery);
@@ -640,7 +642,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   _setSelectItem(item) {
-    _searchDelegate?.close(context, null);
+    _searchDelegate.close(context, null);
     setState(() {
       _selectedItem = item;
     });
@@ -725,9 +727,9 @@ class _HomePageState extends State<HomePage> {
                                 "";
                         songRequestData['user_contact'] =
                             FirebaseAuth.instance.currentUser?.email ?? "";
-                        songRequestRef?.set(songRequestData)?.whenComplete(() {
+                        songRequestRef.set(songRequestData).whenComplete(() {
                           Navigator.pop(context);
-                        })?.catchError((error) {});
+                        }).catchError((error) {});
                       }
                     }),
               ],

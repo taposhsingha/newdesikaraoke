@@ -16,19 +16,17 @@ class Music {
 
   Music.fromMap(Map<dynamic, dynamic> data) {
     artist = data['artist'];
-    banglatitle = data['banglatitle'];
-    banglaartist = data['banglaartist'];
-    genre = data['genre'];
-    language = data['language'];
-    lyricoffset = data['lyricoffset'];
-    lyricref = data['lyricref'];
-    storagepath = data['storagepath'];
-    title = data['title'];
-    trial = data['trial'];
-    effectivetitle =
-        banglatitle == null || banglatitle == "" ? title : banglatitle;
-    effectiveartist =
-        banglaartist == null || banglaartist == "" ? artist : banglaartist;
+    banglatitle = data['banglatitle'] ?? "";
+    banglaartist = data['banglaartist'] ?? "";
+    genre = data['genre'] ?? "";
+    language = data['language'] ?? "";
+    lyricoffset = data['lyricoffset'] ?? "";
+    lyricref = data['lyricref'] ?? "";
+    storagepath = data['storagepath'] ?? "";
+    title = data['title'] ?? "";
+    trial = data['trial'] ?? "";
+    effectivetitle = banglatitle == "" ? title : banglatitle;
+    effectiveartist = banglaartist == "" ? artist : banglaartist;
   }
 
   @override

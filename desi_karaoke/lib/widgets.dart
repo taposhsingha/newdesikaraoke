@@ -38,7 +38,7 @@ class _MusicTileState extends State<MusicTile> {
                       widget.music.isFavorite = false;
                       var list = widget.prefs
                               .getStringList(SharedPreferencesKeys.FAVORITES) ??
-                          List<String>.empty();
+                          List<String>.empty(growable: true);
                       list.remove(widget.music.key);
                       widget.prefs
                           .setStringList(SharedPreferencesKeys.FAVORITES, list);
@@ -51,7 +51,7 @@ class _MusicTileState extends State<MusicTile> {
                       widget.music.isFavorite = true;
                       var list = widget.prefs
                               .getStringList(SharedPreferencesKeys.FAVORITES) ??
-                          List<String>.empty();
+                          List<String>.empty(growable: true);
                       list.add(widget.music.key);
                       widget.prefs
                           .setStringList(SharedPreferencesKeys.FAVORITES, list);
@@ -73,7 +73,11 @@ class ItemTile extends StatelessWidget {
   final IconData icon;
   final int count;
 
-  const ItemTile({required this.title, required this.onTap, required this.icon, required this.count});
+  const ItemTile(
+      {required this.title,
+      required this.onTap,
+      required this.icon,
+      required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -86,9 +90,7 @@ class ItemTile extends StatelessWidget {
           trailing: badges.Badge(
             badgeContent: Text('$count', style: TextStyle(color: Colors.white)),
             badgeStyle: badges.BadgeStyle(
-              shape: badges.BadgeShape.square,
-              badgeColor: Colors.blueAccent
-            ),
+                shape: badges.BadgeShape.square, badgeColor: Colors.blueAccent),
             /*badgeColor: Colors.blueAccent,
             shape: BadgeShape.square,
             // borderRadius: 20,
