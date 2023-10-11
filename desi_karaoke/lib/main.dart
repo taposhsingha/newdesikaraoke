@@ -191,6 +191,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text(LocStr.of(context)!.helloWorld));
                 } else {
+                  print(snapshot.error);
                   return InkWell(
                       onTap: () {
                         setState(() {});
@@ -251,7 +252,93 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Future buildThen() async {
+  Future<void> buildThen() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      throw ConnectivityException(NO_CONNECTION);
+    }
+    if (items.isNotEmpty) {
+      return;
+    } else {
+      DatabaseReference musicDataRef = FirebaseDatabase.instance.reference().child("music");
+      FirebaseDatabase.instance.setPersistenceEnabled(true);
+      FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
+      musicDataRef.keepSynced(true);
+      await musicDataRef
+          .once()
+          .timeout(Duration(seconds: 30),
+          onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
+          .then((DatabaseEvent event) async {
+        /*if (prefs == null) {
+          prefs = await SharedPreferences.getInstance();
+        }*/
+        prefs = await SharedPreferences.getInstance();
+        favoriteKeyList = prefs.getStringList(SharedPreferencesKeys.FAVORITES) ?? List<String>.empty();
+        List<Music> list = <Music>[];
+        if (favoriteKeyList != null) {
+          favoriteMusic.clear();
+        }
+        (event.snapshot.value as Map).forEach((key, value) {
+          Music music = Music.fromMap(value);
+          music.key = key;
+          if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+            music.isFavorite = true;
+          }
+          list.add(music);
+        });
+        items.clear();
+        items.addAll(list);
+        items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
+      });
+    }
+  }
+
+ /* Future buildThen() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.none) {
+      throw ConnectivityException(NO_CONNECTION);
+    }
+    if (items.isNotEmpty) {
+      return;
+    } else {
+      DatabaseReference musicDataRef =
+      FirebaseDatabase.instance.reference().child("music");
+      FirebaseDatabase.instance.setPersistenceEnabled(true);
+      FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
+      musicDataRef.keepSynced(true);
+      await musicDataRef
+          .once()
+          .timeout(Duration(seconds: 30),
+          onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
+          .then((DataSnapshot data) async {
+        if (prefs == null) {
+          prefs = await SharedPreferences.getInstance();
+        }
+        favoriteKeyList =
+            prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
+                List<String>();
+        List<Music> list = new List();
+        if (favoriteKeyList != null) {
+          favoriteMusic.clear();
+        }
+        data.value.forEach(
+              (key, value) {
+            Music music = Music.fromMap(value);
+            music.key = key;
+            if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+              music.isFavorite = true;
+            }
+            list.add(music);
+          },
+        );
+        items.clear();
+        items.addAll(list);
+        items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
+      });
+    }
+  }*/
+
+  /*Future buildThen() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.none) {
       throw ConnectivityException(NO_CONNECTION);
@@ -279,7 +366,20 @@ class _HomePageState extends State<HomePage> {
             if (favoriteKeyList != null) {
               favoriteMusic.clear();
             }
-            Map<dynamic, dynamic> musicData =
+            *//*Map<dynamic, dynamic> musicData =
+            data.value as Map<dynamic, dynamic>;*//*
+            Map<String, dynamic> musicData = data.value as Map<String, dynamic>;
+            musicData.forEach(
+                  (key, value) {
+                Music music = Music.fromMap(value);
+                music.key = key;
+                if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
+                  music.isFavorite = true;
+                }
+                list.add(music);
+              },
+            );
+            *//*Map<dynamic, dynamic> musicData =
                 data.value as Map<dynamic, dynamic>;
             musicData.forEach(
               (key, value) {
@@ -290,13 +390,13 @@ class _HomePageState extends State<HomePage> {
                 }
                 list.add(music);
               },
-            );
+            );*//*
             items.clear();
             items.addAll(list);
             items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
           } as FutureOr Function(DatabaseEvent value));
     }
-  }
+  }*/
 
   StatelessWidget buildNavItem([String? filter]) {
     if (_selectedIndex == NavigationItem.home.index) {
