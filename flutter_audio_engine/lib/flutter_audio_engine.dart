@@ -38,26 +38,49 @@ class AudioEngine {
   late Stream<PlayerStatus> _playerStatusStream;
   late Stream<int> _playerPositionStream;
 
-  Future stop() async {
+  /*Future stop() async {
     try {
       await platform.invokeMethod("stop");
     } on PlatformException catch (e) {
       print(e.message);
     }
+  }*/
+  /*AudioEngine() {
+    _playerStatusStream = playerStatusChannel
+        .receiveBroadcastStream("forStatus")
+        .map<PlayerStatus>((value) => fromCode(value));
+    // Initialize the `_playerPositionStream` variable in the constructor.
+    _playerPositionStream = playerPositionChannel.receiveBroadcastStream("forPosition");
+  }*/
+  AudioEngine() {
+    _playerStatusStream = playerStatusChannel
+        .receiveBroadcastStream("forStatus")
+        .map<PlayerStatus>((value) => fromCode(value));
+    // Initialize the `_playerPositionStream` variable in the constructor.
+    _playerPositionStream = playerPositionChannel.receiveBroadcastStream("forPosition").cast<int>();
+  }
+  Future stop() async {
+    if (_playerStatusStream != null) {
+      try {
+        await platform.invokeMethod("stop");
+      } on PlatformException catch (e) {
+        print(e.message);
+      }
+    }
   }
 
-  Stream<PlayerStatus> get getPlayerStatusStream {
+  /*Stream<PlayerStatus> get getPlayerStatusStream {
     return _playerStatusStream ??= playerStatusChannel
         .receiveBroadcastStream("forStatus")
         .map<PlayerStatus>((value) => fromCode(value));
-  }
+  }*/
 
+  Stream<PlayerStatus> get getPlayerStatusStream {
+    return _playerStatusStream;
+  }
   Stream<int> get getPlayerPositionStream {
-    return _playerPositionStream ??= playerPositionChannel
-        .receiveBroadcastStream("forPosition")
-        .map<int>((value) => value);
+    return _playerPositionStream;
   }
-
   Future setVolume(double volume) async {
     try {
       await platform.invokeMethod("setVolume", {"volume": volume});

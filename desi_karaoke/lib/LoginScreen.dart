@@ -206,7 +206,8 @@ class FirebaseAuthUIExample extends StatelessWidget {
         '/profile': (context) {
           final platform = Theme.of(context).platform;
 
-          return HomePage();
+          //return HomePage();
+          return MyApp();
 
         },
       },
