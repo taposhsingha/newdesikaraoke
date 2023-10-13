@@ -538,8 +538,7 @@ class _KaraokePageState extends State<KaraokePage>
   }
 
   _startDownload(Reference storageReference) async {
-    String musicDownloadUrl = await methodChannel
-        .invokeMethod("getDownloadUrl", {"path": storageReference.fullPath});
+    String musicDownloadUrl = await storageReference.getDownloadURL();
     musicDownloadUrl = musicDownloadUrl.replaceAll("(", "%28");
     musicDownloadUrl = musicDownloadUrl.replaceAll(")", "%29");
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");

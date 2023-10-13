@@ -16,33 +16,49 @@ import 'package:flutter/services.dart';
 import 'flutter_audio_engine_platform_interface.dart';
 
 class FlutterAudioEngine {
-  static const MethodChannel _channel =
-  MethodChannel('flutter_audio_engine');
+  static const MethodChannel _channel = MethodChannel('flutter_audio_engine');
 
   static Future<String> get platformVersion async {
     final String version = await _channel.invokeMethod('getPlatformVersion');
     return version;
   }
+
   Future<String?> getPlatformVersion() {
     return FlutterAudioEnginePlatform.instance.getPlatformVersion();
   }
 }
 
 class AudioEngine {
-  static const MethodChannel platform =
-  MethodChannel('flutter_audio_engine');
+  static const MethodChannel platform = MethodChannel('flutter_audio_engine');
   static const playerStatusChannel = EventChannel("borhnn/playerStatus");
   static const playerPositionChannel =
-  const EventChannel("borhnn/playerPosition");
+      const EventChannel("borhnn/playerPosition");
 
   late Stream<PlayerStatus> _playerStatusStream;
   late Stream<int> _playerPositionStream;
 
+  /*AudioEngine() {
+    _playerStatusStream = playerStatusChannel
+        .receiveBroadcastStream("forStatus")
+        .map<PlayerStatus>((value) => fromCode(value));
+    // Initialize the `_playerPositionStream` variable in the constructor.
+    _playerPositionStream = playerPositionChannel.receiveBroadcastStream("forPosition");
+  }*/
+  AudioEngine() {
+    _playerStatusStream = playerStatusChannel
+        .receiveBroadcastStream("forStatus")
+        .map<PlayerStatus>((value) => fromCode(value));
+    // Initialize the `_playerPositionStream` variable in the constructor.
+    _playerPositionStream =
+        playerPositionChannel.receiveBroadcastStream("forPosition").cast<int>();
+  }
   Future stop() async {
-    try {
-      await platform.invokeMethod("stop");
-    } on PlatformException catch (e) {
-      print(e.message);
+    if (_playerStatusStream != null) {
+      try {
+        await platform.invokeMethod("stop");
+      } on PlatformException catch (e) {
+        print(e.message);
+      }
     }
   }
 
