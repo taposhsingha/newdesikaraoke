@@ -116,7 +116,9 @@ class _KaraokePageState extends State<KaraokePage>
     WidgetsBinding.instance.addObserver(this);
     Reference storageReference =
         FirebaseStorage.instance.ref().child(widget.music.storagepath);
-    _startDownload(storageReference);
+    Reference lyricReference =
+        FirebaseStorage.instance.ref().child(widget.music.lyricref);
+    _startDownload(storageReference, lyricReference);
 
     var stream = audioEngine.getPlayerStatusStream;
     var positionStream = audioEngine.getPlayerPositionStream;
@@ -156,10 +158,28 @@ class _KaraokePageState extends State<KaraokePage>
           .child("users/${user.uid}")
           .once()
           .then((data) {
-        int? currentTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
-        int? signUpTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
+        int? currentTime;
+        try {
+          final Map<Object, Object> rawData =
+              data.snapshot.value as Map<Object, Object>;
+          final Map<String, dynamic> convertedData =
+              rawData.cast<String, dynamic>();
+          currentTime = convertedData['currenttime'];
+        } on Exception catch (e, s) {
+          currentTime = null;
+          print(s);
+        }
+        int? signUpTime;
+        try {
+          final Map<Object, Object> rawData =
+              data.snapshot.value as Map<Object, Object>;
+          final Map<String, dynamic> convertedData =
+              rawData.cast<String, dynamic>();
+          currentTime = convertedData['signuptime'];
+        } on Exception catch (e, s) {
+          currentTime = null;
+          print(s);
+        }
 
         if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
           setPlaybackValidity(() {
@@ -540,16 +560,16 @@ class _KaraokePageState extends State<KaraokePage>
     audioEngine.initPlayer(musicDownloadUrl);
     Uint8List lyricint8 = await methodChannel
         .invokeMethod("getFileFromDo", {"path": widget.music.lyricref});
-    var bytes = lyricint8;
+      var bytes = lyricint8;
 
-    String lyric = "";
+      String lyric = "";
 
     if (hasUtf16LeBom(bytes)) {
-      lyric = Utf16Decoder().decodeUtf16Le(bytes);
-    } else {
-      lyric = utf8.decode(bytes);
-    }
-    _karaoke = await buildLyric(lyric);
+        lyric = Utf16Decoder().decodeUtf16Le(bytes);
+      } else {
+        lyric = utf8.decode(bytes);
+      }
+      _karaoke = await buildLyric(lyric);
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
