@@ -69,9 +69,8 @@ class _KaraokePageState extends State<KaraokePage>
   // Data fields
   late String uid;
   late int _lyricPosition;
-  late bool isMusicTrialExpired;
-  late bool isTrialAccount;
-  late bool isValidDeviceConnected;
+  bool isMusicTrialExpired = false;
+  bool isTrialAccount = false;
   bool isFreeModeEnabled = false;
   int trialMillis = 1000 * 1000;
 
@@ -145,9 +144,36 @@ class _KaraokePageState extends State<KaraokePage>
       default:
         trialMillis = 40 * 1000;
     }
+    var user = FirebaseAuth.instance.currentUser;
+    uid = user!.uid;
+    FirebaseDatabase.instance
+        .ref()
+        .child("users/${user.uid}/currenttime")
+        .set(ServerValue.timestamp)
+        .whenComplete(() {
+      FirebaseDatabase.instance
+          .ref()
+          .child("users/${user.uid}")
+          .once()
+          .then((data) {
+        int? currentTime =
+            (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
+        int? signUpTime =
+            (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
+
+        if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
+          setPlaybackValidity(() {
+            isTrialAccount = true;
+          });
+        } else {
+          setPlaybackValidity(() {
+            isTrialAccount = false;
+          });
+        }
+      });
+    });
 
     // trialMillis = 7000;
-
     playerPositionSubscription = positionStream.listen((position) {
       var lyricPosition = _karaoke.timedTextMap
           .lastKeyBefore(position - widget.music.lyricoffset);
@@ -183,37 +209,6 @@ class _KaraokePageState extends State<KaraokePage>
         .then((value) {
       setPlaybackValidity(() {
         isFreeModeEnabled = value.snapshot.value as bool;
-      });
-    });
-    var user = FirebaseAuth.instance.currentUser;
-    uid = user!.uid;
-    FirebaseDatabase.instance
-        .ref()
-        .child("users/${user.uid}/currenttime")
-        .set(ServerValue.timestamp)
-        .whenComplete(() {
-      FirebaseDatabase.instance
-          .ref()
-          .child("users/${user.uid}")
-          .once()
-          .then((data) {
-        int? currentTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
-        int? signUpTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
-
-        if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
-          setPlaybackValidity(() {
-            isTrialAccount = true;
-          });
-        } else {
-          setPlaybackValidity(() {
-            isTrialAccount = false;
-          });
-        }
-        // setPlaybackValidity(() {
-        //   isTrialAccount = false;
-        // });
       });
     });
   }
@@ -554,41 +549,7 @@ class _KaraokePageState extends State<KaraokePage>
     } else {
       lyric = utf8.decode(bytes);
     }
-    /*if (hasUtf16leBom(bytes)) {
-      lyric = decodeUtf16le(bytes);
-    } else
-      lyric = decodeUtf8(bytes);*/
     _karaoke = await buildLyric(lyric);
-    /*FirebaseDatabase.instance.ref().child("devices").once().then((data) {
-      data.snapshot.value!.forEach(
-            (key, value) {
-          KaraokeDevice device = KaraokeDevice.fromMap(value);
-          deviceList.add(device);
-        },
-      );
-    })*/
-    FirebaseDatabase.instance.ref().child("devices").once().then((data) {
-      Map<dynamic, dynamic>? values = data.snapshot.value as Map?;
-      values?.forEach(
-        (key, value) {
-          KaraokeDevice device = KaraokeDevice.fromMap(value);
-          deviceList.add(device);
-        },
-      );
-    }).whenComplete(() {
-      subBluetooth = platform.receiveBroadcastStream().listen((mac) {
-        var deviceMatches = false;
-        deviceList.forEach((device) {
-          if (device.mac == mac.toString()) {
-            deviceMatches = true;
-          }
-        });
-        setPlaybackValidity(() {
-          isValidDeviceConnected = deviceMatches;
-          // isValidDeviceConnected = true;
-        });
-      });
-    });
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
@@ -684,10 +645,8 @@ class _KaraokePageState extends State<KaraokePage>
 
   void setPlaybackValidity(VoidCallback fn) {
     fn();
-    var shouldPlayLoud = isTrialAccount ||
-        isValidDeviceConnected ||
-        !isMusicTrialExpired ||
-        isFreeModeEnabled;
+    var shouldPlayLoud =
+        isTrialAccount || !isMusicTrialExpired || isFreeModeEnabled;
 
     switch (shouldPlayLoud) {
       case false:
