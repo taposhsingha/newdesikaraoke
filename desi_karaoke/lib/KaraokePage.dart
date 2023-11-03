@@ -552,24 +552,30 @@ class _KaraokePageState extends State<KaraokePage>
     super.dispose();
   }
 
-  _startDownload(Reference storageReference) async {
+  _startDownload(Reference storageReference, Reference lyricReference) async {
     String musicDownloadUrl = await storageReference.getDownloadURL();
     musicDownloadUrl = musicDownloadUrl.replaceAll("(", "%28");
     musicDownloadUrl = musicDownloadUrl.replaceAll(")", "%29");
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");
     audioEngine.initPlayer(musicDownloadUrl);
-    Uint8List lyricint8 = await methodChannel
-        .invokeMethod("getFileFromDo", {"path": widget.music.lyricref});
-      var bytes = lyricint8;
 
-      String lyric = "";
+    const oneMegabyte = 1024 * 1024;
+    final Uint8List? lyricint8 =
+        await lyricReference.getData(oneMegabyte); // var type kono vabe ber kor
 
-    if (hasUtf16LeBom(bytes)) {
-        lyric = Utf16Decoder().decodeUtf16Le(bytes);
-      } else {
-        lyric = utf8.decode(bytes);
-      }
-      _karaoke = await buildLyric(lyric);
+    var bytes = lyricint8; // check kor eikhane
+
+    String lyric = "";
+
+    if (hasUtf16LeBom(bytes!)) {
+      lyric = Utf16Decoder().decodeUtf16Le(bytes);
+    } else {
+      lyric = utf8.decode(bytes);
+    }
+    print("hi");
+
+    _karaoke = await buildLyric(lyric);
+    print(_karaoke);
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {

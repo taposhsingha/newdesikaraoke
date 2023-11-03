@@ -25,8 +25,8 @@ class KaraokeTimedText {
 }
 
 class LyricHighlightEvent {
-   KaraokeLine? line;
-   int? wordnumber;
+  KaraokeLine? line;
+  int? wordnumber;
 
   LyricHighlightEvent([this.line, this.wordnumber]);
 }
@@ -228,6 +228,8 @@ void categorize(String kscFile, Karaoke karaoke) {
   for (String line in lines) {
     if (line.startsWith("karaoke.add")) {
       karaokeLines.add(getEventMap(line));
+      print("=== here ====");
+      print(karaokeLines);
     }
     if (line.startsWith("karaoke.title1")) {
       karaoke.title1 = getValueString(line)!;
