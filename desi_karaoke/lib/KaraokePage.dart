@@ -63,7 +63,7 @@ class _KaraokePageState extends State<KaraokePage>
   int _playerSpeedStep = 0;
   int _playerHalfstepDelta = 0;
   int _countdownPosition = 0;
-  late PlayerStatus? statusBeforeBackground;
+  PlayerStatus? statusBeforeBackground;
   bool isFlushbarShown = false;
 
   // Data fields
@@ -559,12 +559,11 @@ class _KaraokePageState extends State<KaraokePage>
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");
     audioEngine.initPlayer(musicDownloadUrl);
 
-    const oneMegabyte = 1024 * 1024;
+    const oneMegabyte = 2048 * 2048;
     final Uint8List? lyricint8 =
-        await lyricReference.getData(oneMegabyte); // var type kono vabe ber kor
+    await lyricReference.getData(oneMegabyte); // var type kono vabe ber kor
 
     var bytes = lyricint8; // check kor eikhane
-
     String lyric = "";
 
     if (hasUtf16LeBom(bytes!)) {
@@ -572,10 +571,11 @@ class _KaraokePageState extends State<KaraokePage>
     } else {
       lyric = utf8.decode(bytes);
     }
+    print(lyric);
     print("hi");
 
     _karaoke = await buildLyric(lyric);
-    print(_karaoke);
+
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
