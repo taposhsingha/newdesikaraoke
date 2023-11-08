@@ -45,6 +45,8 @@ dependencies:
   upgrader: ^8.1.0
   badges: ^3.1.2
   intl: ^0.18.1
+  path_provider: ^2.1.1
+  dio: ^5.3.3
 
 dev_dependencies:
   flutter_test:

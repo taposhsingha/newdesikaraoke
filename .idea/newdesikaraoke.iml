@@ -3,11 +3,16 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/desi_karaoke/.dart_tool/flutter_gen/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/desi_karaoke/.dart_tool/flutter_gen/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/desi_karaoke/.dart_tool/flutter_gen/build" />
+      <excludeFolder url="file://$MODULE_DIR$/desi_karaoke/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/desi_karaoke/build" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/build" />
-      <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_audio_engine/example/build" />
     </content>
     <orderEntry type="inheritedJdk" />

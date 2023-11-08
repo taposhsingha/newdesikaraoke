@@ -52,8 +52,7 @@ class KaraokeLine {
   }
 }
 
-
-List<KaraokeLine>? karaokeLines=[];
+List<KaraokeLine>? karaokeLines = [];
 int? totalLines;
 List<List<KaraokeLine>>? interludeGroups;
 SplayTreeMap<int, LyricPair>? timedLines;
@@ -74,8 +73,8 @@ class LyricPair extends Object with IterableMixin<KaraokeLine> {
 }
 
 Future<Karaoke> buildLyric(String kscFile) async {
-  karaokeLines = List.empty();
-  interludeGroups = List.empty();
+  karaokeLines = List.empty(growable: true);
+  interludeGroups = List.empty(growable: true);
   timedLines = SplayTreeMap();
   final Karaoke karaoke = Karaoke();
   categorize(kscFile, karaoke);

@@ -7,6 +7,7 @@ import 'package:desi_karaoke_lite/lyricBuilder.dart';
 import 'package:desi_karaoke_lite/models.dart';
 import 'package:desi_karaoke_lite/widgets/fading_background.dart';
 import 'package:desi_karaoke_lite/widgets/spinning_logo.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_audio_engine/flutter_audio_engine.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flu_wake_lock/flu_wake_lock.dart';
 import 'dart:convert';
@@ -559,23 +561,55 @@ class _KaraokePageState extends State<KaraokePage>
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");
     audioEngine.initPlayer(musicDownloadUrl);
 
-    const oneMegabyte = 2048 * 2048;
-    final Uint8List? lyricint8 =
-    await lyricReference.getData(oneMegabyte); // var type kono vabe ber kor
+    // const oneMegabyte = 2048 * 2048;
+    // final Uint8List? lyricint8 = await lyricReference.getData(oneMegabyte);
 
-    var bytes = lyricint8; // check kor eikhane
+    // var bytes = lyricint8;
+    // String lyric = "";
+
+    // if (hasUtf16LeBom(bytes!)) {
+    //   lyric = Utf16Decoder().decodeUtf16Le(bytes);
+    // } else {
+    //   lyric = utf8.decode(bytes);
+    // }
+    // final lyricUrl = await lyricReference.getDownloadURL();
+
+    // final Directory tempDir = await getTemporaryDirectory();
+    // final file = File('${tempDir.path}/${lyricReference.name}');
+
+    // await Dio().download(lyricUrl, file);
+    final lyricint8 = await getUint8ListFromDownload(lyricReference);
+    var bytes = lyricint8;
     String lyric = "";
-
     if (hasUtf16LeBom(bytes!)) {
       lyric = Utf16Decoder().decodeUtf16Le(bytes);
     } else {
       lyric = utf8.decode(bytes);
     }
+
+    print("============hi==========");
     print(lyric);
-    print("hi");
 
     _karaoke = await buildLyric(lyric);
+  }
 
+  Future<Uint8List> getUint8ListFromDownload(Reference lyricReference) async {
+    // Get the file download URL
+    final lyricUrl = await lyricReference.getDownloadURL();
+
+    // Create a temporary directory to store the downloaded file
+    final Directory tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/${lyricReference.name}';
+
+    // Download the file to the temporary directory
+    await Dio().download(lyricUrl, filePath);
+
+    // Read the downloaded file as bytes
+    final file = File(filePath);
+    final bytes = await file.readAsBytes();
+
+    // Convert the bytes to a Uint8List
+    return Uint8List.fromList(bytes);
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
