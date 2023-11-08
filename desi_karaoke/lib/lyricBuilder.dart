@@ -18,10 +18,10 @@ class Karaoke {
 }
 
 class KaraokeTimedText {
-  List<KaraokeLine>? lines = List<KaraokeLine>.empty();
-  LyricHighlightEvent? lyricHighlightEvent = LyricHighlightEvent();
+  List<KaraokeLine> lines = [];
+  LyricHighlightEvent lyricHighlightEvent = LyricHighlightEvent();
 
-  KaraokeTimedText([this.lines, this.lyricHighlightEvent]);
+  KaraokeTimedText([this.lines=const [], this.lyricHighlightEvent =  LyricHighlightEvent()]);
 }
 
 class LyricHighlightEvent {
@@ -35,10 +35,10 @@ class KaraokeLine {
   int? startTime;
   int? endTime;
   bool hasCountdown = false;
-  late List<String> words;
-  late List<int> durations;
-  late bool isCountdown;
-  late int showTime;
+   List<String> words=List.empty(growable: true);
+   List<int> durations=List.empty(growable: true);
+   bool isCountdown=false;
+   int showTime=0;
 
   KaraokeLine({int? startTime, int? endTime}) {
     this.startTime = startTime;
@@ -52,10 +52,10 @@ class KaraokeLine {
   }
 }
 
-List<KaraokeLine>? karaokeLines = [];
-int? totalLines;
-List<List<KaraokeLine>>? interludeGroups;
-SplayTreeMap<int, LyricPair>? timedLines;
+List<KaraokeLine> karaokeLines = [];
+int totalLines=0;
+List<List<KaraokeLine>> interludeGroups=[];
+SplayTreeMap<int, LyricPair> timedLines=SplayTreeMap<int, LyricPair>();
 
 class LyricPair extends Object with IterableMixin<KaraokeLine> {
   KaraokeLine? firstLine;
@@ -92,14 +92,14 @@ Future<Karaoke> buildLyric(String kscFile) async {
 }
 
 makeTimedTexts(Karaoke karaoke) {
-  timedLines?.forEach((time, pair) {
+  timedLines.forEach((time, pair) {
     karaoke.timedTextMap[time] = KaraokeTimedText(
         pair.toArray(), LyricHighlightEvent(pair.firstLine, -1));
   });
 
-  karaokeLines?.forEach((line) {
-    int? time = timedLines?.lastKeyBefore(line.endTime!);
-    LyricPair? pair = timedLines?[time];
+  karaokeLines.forEach((line) {
+    int? time = timedLines.lastKeyBefore(line.endTime!);
+    LyricPair? pair = timedLines[time];
     var timeShift = line.startTime;
     line.durations.asMap().forEach((wordNum, duration) {
       karaoke.timedTextMap[timeShift] =
@@ -149,12 +149,12 @@ makeTimedLines() {
 }
 
 groupInterludes() {
-  List<KaraokeLine> group = List.empty();
+  List<KaraokeLine> group = List<KaraokeLine>.empty(growable: true);
   for (var karaokeLine in karaokeLines!) {
     if (karaokeLine.hasCountdown) {
       if (group.isNotEmpty) {
-        interludeGroups?.add(group);
-        group = List.empty();
+        interludeGroups.add(group);
+        group = List<KaraokeLine>.empty(growable: true);
       }
     }
     group.add(karaokeLine);
@@ -202,18 +202,18 @@ makeCountdownMap(Karaoke karaoke) {
 }
 
 void addEmptyLinesBeforeCountDown() {
-  var lines = List<KaraokeLine>.empty();
+  var lines = List<KaraokeLine>.empty(growable: true);
 
-  karaokeLines?.asMap().forEach((lineNumber, line) {
+  karaokeLines.asMap().forEach((lineNumber, line) {
     if (line.hasCountdown && lineNumber != 0) {
-      final KaraokeLine prevLine = karaokeLines![lineNumber - 1];
+      final KaraokeLine prevLine = karaokeLines[lineNumber - 1];
       lines.add(KaraokeLine(
           startTime: prevLine.endTime! + 1, endTime: prevLine.endTime! + 2));
     }
   });
 
-  karaokeLines?.addAll(lines);
-  karaokeLines?.sort((a, b) {
+  karaokeLines.addAll(lines);
+  karaokeLines.sort((a, b) {
     return a.startTime!.compareTo(b.startTime as num);
   });
 }
@@ -259,7 +259,7 @@ void categorize(String kscFile, Karaoke karaoke) {
       karaoke.latinsinger = getValueString(line)!;
     }
   }
-  totalLines = karaokeLines?.length;
+  totalLines = karaokeLines.length;
 }
 
 KaraokeLine getEventMap(String lineString) {
