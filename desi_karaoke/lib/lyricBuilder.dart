@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:convert';
 
 class Karaoke {
-  late String title1;
+  /*late String title1;
   late String title2;
   late String music;
   late String writer;
@@ -11,18 +11,30 @@ class Karaoke {
   late String latintitle2;
   late String latinmusic;
   late String latinwriter;
-  late String latinsinger;
+  late String latinsinger;*/
+  String title1 = '';
+  String title2 = '';
+  String music = '';
+  String writer = '';
+  String singer = '';
+  String latintitle1 = '';
+  String latintitle2 = '';
+  String latinmusic = '';
+  String latinwriter = '';
+  String latinsinger = '';
 
   SplayTreeMap timedTextMap = SplayTreeMap<int, KaraokeTimedText>();
   SplayTreeMap countdownTimes = SplayTreeMap<int, String>();
 }
 
 class KaraokeTimedText {
-  List<KaraokeLine> lines = [];
-  LyricHighlightEvent lyricHighlightEvent = LyricHighlightEvent();
+  /*List<KaraokeLine>? lines = List<KaraokeLine>.empty();*/
+  List<KaraokeLine> lines = const [];
+  LyricHighlightEvent? lyricHighlightEvent = LyricHighlightEvent();
 
-  KaraokeTimedText([this.lines=const [], this.lyricHighlightEvent =  LyricHighlightEvent()]);
+  KaraokeTimedText([this.lines=const [], this.lyricHighlightEvent]);
 }
+
 
 class LyricHighlightEvent {
   KaraokeLine? line;
@@ -69,7 +81,14 @@ class LyricPair extends Object with IterableMixin<KaraokeLine> {
   @override
   toString() => "first: $firstLine, second: $secondLine";
 
-  toArray() => [firstLine, secondLine];
+  /*toArray() => [firstLine, secondLine];*/
+  List<KaraokeLine> toArray() {
+    if (firstLine != null && secondLine != null) {
+      return [firstLine!, secondLine!]; // Use '!' to assert non-nullness
+    } else {
+      return []; // Return an empty list if either line is null
+    }
+  }
 }
 
 Future<Karaoke> buildLyric(String kscFile) async {
@@ -92,6 +111,7 @@ Future<Karaoke> buildLyric(String kscFile) async {
 }
 
 makeTimedTexts(Karaoke karaoke) {
+
   timedLines.forEach((time, pair) {
     karaoke.timedTextMap[time] = KaraokeTimedText(
         pair.toArray(), LyricHighlightEvent(pair.firstLine, -1));
@@ -103,7 +123,7 @@ makeTimedTexts(Karaoke karaoke) {
     var timeShift = line.startTime;
     line.durations.asMap().forEach((wordNum, duration) {
       karaoke.timedTextMap[timeShift] =
-          KaraokeTimedText(pair?.toArray(), LyricHighlightEvent(line, wordNum));
+          KaraokeTimedText(pair!.toArray(), LyricHighlightEvent(line, wordNum));
 
       /*timeShift += duration;*/
       var nonNullableTimeShift = timeShift;
@@ -116,8 +136,8 @@ makeTimedTexts(Karaoke karaoke) {
 }
 
 makeTimedLines() {
-  timedLines?[0] = LyricPair();
-  for (var interlude in interludeGroups!) {
+  timedLines[0] = LyricPair();
+  for (var interlude in interludeGroups) {
     final pair = LyricPair();
     int? timeCode;
     final interludeStartsAt = interlude[0].startTime! - 5000;
@@ -142,15 +162,15 @@ makeTimedLines() {
         }
       }
       interludeEndAt = line.endTime;
-      timedLines?[timeCode!] = LyricPair(pair.firstLine, pair.secondLine);
+      timedLines[timeCode!] = LyricPair(pair.firstLine, pair.secondLine);
     });
-    timedLines?[interludeEndAt!] = LyricPair();
+    timedLines[interludeEndAt!] = LyricPair();
   }
 }
 
 groupInterludes() {
   List<KaraokeLine> group = List<KaraokeLine>.empty(growable: true);
-  for (var karaokeLine in karaokeLines!) {
+  for (var karaokeLine in karaokeLines) {
     if (karaokeLine.hasCountdown) {
       if (group.isNotEmpty) {
         interludeGroups.add(group);
@@ -159,11 +179,11 @@ groupInterludes() {
     }
     group.add(karaokeLine);
   }
-  interludeGroups?.add(group);
+  interludeGroups.add(group);
 }
 
 setShowTimes() {
-  karaokeLines?.forEach((it) {
+  karaokeLines.forEach((it) {
     if (it.hasCountdown) {
       final secAgo = it.startTime! - 5000;
       if (secAgo >= 0)
@@ -176,10 +196,10 @@ setShowTimes() {
 }
 
 removeOverlaps() {
-  karaokeLines?.asMap().forEach((index, karaokeLine) {
-    if (index < totalLines! - 1) {
-      final nextLine = karaokeLines?[index + 1];
-      if (nextLine!.startTime! < karaokeLine.endTime!) {
+  karaokeLines.asMap().forEach((index, karaokeLine) {
+    if (index < totalLines - 1) {
+      final nextLine = karaokeLines[index + 1];
+      if (nextLine.startTime! < karaokeLine.endTime!) {
         karaokeLine.endTime = nextLine.startTime;
         print("Overlap Found");
       }
@@ -187,11 +207,11 @@ removeOverlaps() {
   });
 }
 
-correctEndTimes() => karaokeLines?.forEach((it) => it.endTime =
+correctEndTimes() => karaokeLines.forEach((it) => it.endTime =
     (it.startTime! + ((it.durations.fold(0, (a, b) => a! + b)) ?? 0)));
 
 makeCountdownMap(Karaoke karaoke) {
-  for (var line in karaokeLines!) {
+  for (var line in karaokeLines) {
     if (line.hasCountdown) {
       karaoke.countdownTimes[line.startTime] = "";
       for (var i in [4, 3, 2, 1]) {
@@ -220,7 +240,7 @@ void addEmptyLinesBeforeCountDown() {
 
 void markCountDownLines() {
   var prevTime = 0;
-  for (KaraokeLine karaokeLine in karaokeLines!) {
+  for (KaraokeLine karaokeLine in karaokeLines) {
     if ((karaokeLine.startTime! - 10000) >= prevTime || prevTime == 0) {
       karaokeLine.hasCountdown = true;
     }
@@ -233,7 +253,7 @@ void categorize(String kscFile, Karaoke karaoke) {
   List lines = ls.convert(kscFile);
   for (String line in lines) {
     if (line.startsWith("karaoke.add")) {
-      karaokeLines?.add(getEventMap(line));
+      karaokeLines.add(getEventMap(line));
       print("=== here ====");
       print(karaokeLines);
     }
