@@ -32,9 +32,8 @@ class KaraokeTimedText {
   List<KaraokeLine> lines = const [];
   LyricHighlightEvent? lyricHighlightEvent = LyricHighlightEvent();
 
-  KaraokeTimedText([this.lines=const [], this.lyricHighlightEvent]);
+  KaraokeTimedText([this.lines = const [], this.lyricHighlightEvent]);
 }
-
 
 class LyricHighlightEvent {
   KaraokeLine? line;
@@ -47,10 +46,10 @@ class KaraokeLine {
   int? startTime;
   int? endTime;
   bool hasCountdown = false;
-   List<String> words=List.empty(growable: true);
-   List<int> durations=List.empty(growable: true);
-   bool isCountdown=false;
-   int showTime=0;
+  List<String> words = List.empty(growable: true);
+  List<int> durations = List.empty(growable: true);
+  bool isCountdown = false;
+  int showTime = 0;
 
   KaraokeLine({int? startTime, int? endTime}) {
     this.startTime = startTime;
@@ -65,9 +64,9 @@ class KaraokeLine {
 }
 
 List<KaraokeLine> karaokeLines = [];
-int totalLines=0;
-List<List<KaraokeLine>> interludeGroups=[];
-SplayTreeMap<int, LyricPair> timedLines=SplayTreeMap<int, LyricPair>();
+int totalLines = 0;
+List<List<KaraokeLine>> interludeGroups = [];
+SplayTreeMap<int, LyricPair> timedLines = SplayTreeMap<int, LyricPair>();
 
 class LyricPair extends Object with IterableMixin<KaraokeLine> {
   KaraokeLine? firstLine;
@@ -111,7 +110,6 @@ Future<Karaoke> buildLyric(String kscFile) async {
 }
 
 makeTimedTexts(Karaoke karaoke) {
-
   timedLines.forEach((time, pair) {
     karaoke.timedTextMap[time] = KaraokeTimedText(
         pair.toArray(), LyricHighlightEvent(pair.firstLine, -1));
@@ -254,8 +252,6 @@ void categorize(String kscFile, Karaoke karaoke) {
   for (String line in lines) {
     if (line.startsWith("karaoke.add")) {
       karaokeLines.add(getEventMap(line));
-      print("=== here ====");
-      print(karaokeLines);
     }
     if (line.startsWith("karaoke.title1")) {
       karaoke.title1 = getValueString(line)!;
