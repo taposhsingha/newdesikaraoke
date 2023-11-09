@@ -43,7 +43,7 @@ class _KaraokePageState extends State<KaraokePage>
 
   // Page fields
   AudioEngine audioEngine = AudioEngine();
-  late Karaoke _karaoke;
+   Karaoke _karaoke=Karaoke();
   List<KaraokeDevice> deviceList = [];
 
   // Disposables
@@ -70,7 +70,7 @@ class _KaraokePageState extends State<KaraokePage>
 
   // Data fields
   late String uid;
-  late int _lyricPosition;
+   int _lyricPosition=0;
   bool isMusicTrialExpired = false;
   bool isTrialAccount = false;
   bool isFreeModeEnabled = false;
