@@ -7,6 +7,7 @@ import 'package:desi_karaoke_lite/lyricBuilder.dart';
 import 'package:desi_karaoke_lite/models.dart';
 import 'package:desi_karaoke_lite/widgets/fading_background.dart';
 import 'package:desi_karaoke_lite/widgets/spinning_logo.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,6 +17,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_audio_engine/flutter_audio_engine.dart';
 import 'package:flutter_device_type/flutter_device_type.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flu_wake_lock/flu_wake_lock.dart';
 import 'dart:convert';
@@ -41,7 +43,7 @@ class _KaraokePageState extends State<KaraokePage>
 
   // Page fields
   AudioEngine audioEngine = AudioEngine();
-  late Karaoke _karaoke;
+  Karaoke _karaoke = Karaoke();
   List<KaraokeDevice> deviceList = [];
 
   // Disposables
@@ -63,15 +65,14 @@ class _KaraokePageState extends State<KaraokePage>
   int _playerSpeedStep = 0;
   int _playerHalfstepDelta = 0;
   int _countdownPosition = 0;
-  late PlayerStatus? statusBeforeBackground;
+  PlayerStatus? statusBeforeBackground;
   bool isFlushbarShown = false;
 
   // Data fields
   late String uid;
-  late int _lyricPosition;
-  late bool isMusicTrialExpired;
-  late bool isTrialAccount;
-  late bool isValidDeviceConnected;
+  int _lyricPosition = 0;
+  bool isMusicTrialExpired = false;
+  bool isTrialAccount = false;
   bool isFreeModeEnabled = false;
   int trialMillis = 1000 * 1000;
 
@@ -117,7 +118,9 @@ class _KaraokePageState extends State<KaraokePage>
     WidgetsBinding.instance.addObserver(this);
     Reference storageReference =
         FirebaseStorage.instance.ref().child(widget.music.storagepath);
-    _startDownload(storageReference);
+    Reference lyricReference =
+        FirebaseStorage.instance.ref().child(widget.music.lyricref);
+    _startDownload(storageReference, lyricReference);
 
     var stream = audioEngine.getPlayerStatusStream;
     var positionStream = audioEngine.getPlayerPositionStream;
@@ -145,9 +148,54 @@ class _KaraokePageState extends State<KaraokePage>
       default:
         trialMillis = 40 * 1000;
     }
+    var user = FirebaseAuth.instance.currentUser;
+    uid = user!.uid;
+    FirebaseDatabase.instance
+        .ref()
+        .child("users/${user.uid}/currenttime")
+        .set(ServerValue.timestamp)
+        .whenComplete(() {
+      FirebaseDatabase.instance
+          .ref()
+          .child("users/${user.uid}")
+          .once()
+          .then((data) {
+        int? currentTime;
+        try {
+          final Map<Object, Object> rawData =
+              data.snapshot.value as Map<Object, Object>;
+          final Map<String, dynamic> convertedData =
+              rawData.cast<String, dynamic>();
+          currentTime = convertedData['currenttime'];
+        } on Exception catch (e, s) {
+          currentTime = null;
+          print(s);
+        }
+        int? signUpTime;
+        try {
+          final Map<Object, Object> rawData =
+              data.snapshot.value as Map<Object, Object>;
+          final Map<String, dynamic> convertedData =
+              rawData.cast<String, dynamic>();
+          currentTime = convertedData['signuptime'];
+        } on Exception catch (e, s) {
+          currentTime = null;
+          print(s);
+        }
+
+        if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
+          setPlaybackValidity(() {
+            isTrialAccount = true;
+          });
+        } else {
+          setPlaybackValidity(() {
+            isTrialAccount = false;
+          });
+        }
+      });
+    });
 
     // trialMillis = 7000;
-
     playerPositionSubscription = positionStream.listen((position) {
       var lyricPosition = _karaoke.timedTextMap
           .lastKeyBefore(position - widget.music.lyricoffset);
@@ -183,37 +231,6 @@ class _KaraokePageState extends State<KaraokePage>
         .then((value) {
       setPlaybackValidity(() {
         isFreeModeEnabled = value.snapshot.value as bool;
-      });
-    });
-    var user = FirebaseAuth.instance.currentUser;
-    uid = user!.uid;
-    FirebaseDatabase.instance
-        .ref()
-        .child("users/${user.uid}/currenttime")
-        .set(ServerValue.timestamp)
-        .whenComplete(() {
-      FirebaseDatabase.instance
-          .ref()
-          .child("users/${user.uid}")
-          .once()
-          .then((data) {
-        int? currentTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['currenttime'];
-        int? signUpTime =
-            (data.snapshot.value as Map<String, dynamic>?)?['signuptime'];
-
-        if ((currentTime! - signUpTime!) < 72 * 3600 * 1000) {
-          setPlaybackValidity(() {
-            isTrialAccount = true;
-          });
-        } else {
-          setPlaybackValidity(() {
-            isTrialAccount = false;
-          });
-        }
-        // setPlaybackValidity(() {
-        //   isTrialAccount = false;
-        // });
       });
     });
   }
@@ -537,59 +554,59 @@ class _KaraokePageState extends State<KaraokePage>
     super.dispose();
   }
 
-  _startDownload(Reference storageReference) async {
-    String musicDownloadUrl = await methodChannel
-        .invokeMethod("getDownloadUrl", {"path": storageReference.fullPath});
+  _startDownload(Reference storageReference, Reference lyricReference) async {
+    String musicDownloadUrl = await storageReference.getDownloadURL();
     musicDownloadUrl = musicDownloadUrl.replaceAll("(", "%28");
     musicDownloadUrl = musicDownloadUrl.replaceAll(")", "%29");
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");
     audioEngine.initPlayer(musicDownloadUrl);
-    Uint8List lyricint8 = await methodChannel
-        .invokeMethod("getFileFromDo", {"path": widget.music.lyricref});
+
+    // const oneMegabyte = 2048 * 2048;
+    // final Uint8List? lyricint8 = await lyricReference.getData(oneMegabyte);
+
+    // var bytes = lyricint8;
+    // String lyric = "";
+
+    // if (hasUtf16LeBom(bytes!)) {
+    //   lyric = Utf16Decoder().decodeUtf16Le(bytes);
+    // } else {
+    //   lyric = utf8.decode(bytes);
+    // }
+    // final lyricUrl = await lyricReference.getDownloadURL();
+
+    // final Directory tempDir = await getTemporaryDirectory();
+    // final file = File('${tempDir.path}/${lyricReference.name}');
+
+    // await Dio().download(lyricUrl, file);
+    final lyricint8 = await getUint8ListFromDownload(lyricReference);
     var bytes = lyricint8;
-
     String lyric = "";
-
-    if (hasUtf16LeBom(bytes)) {
+    if (hasUtf16LeBom(bytes!)) {
       lyric = Utf16Decoder().decodeUtf16Le(bytes);
     } else {
       lyric = utf8.decode(bytes);
     }
-    /*if (hasUtf16leBom(bytes)) {
-      lyric = decodeUtf16le(bytes);
-    } else
-      lyric = decodeUtf8(bytes);*/
+
     _karaoke = await buildLyric(lyric);
-    /*FirebaseDatabase.instance.ref().child("devices").once().then((data) {
-      data.snapshot.value!.forEach(
-            (key, value) {
-          KaraokeDevice device = KaraokeDevice.fromMap(value);
-          deviceList.add(device);
-        },
-      );
-    })*/
-    FirebaseDatabase.instance.ref().child("devices").once().then((data) {
-      Map<dynamic, dynamic>? values = data.snapshot.value as Map?;
-      values?.forEach(
-        (key, value) {
-          KaraokeDevice device = KaraokeDevice.fromMap(value);
-          deviceList.add(device);
-        },
-      );
-    }).whenComplete(() {
-      subBluetooth = platform.receiveBroadcastStream().listen((mac) {
-        var deviceMatches = false;
-        deviceList.forEach((device) {
-          if (device.mac == mac.toString()) {
-            deviceMatches = true;
-          }
-        });
-        setPlaybackValidity(() {
-          isValidDeviceConnected = deviceMatches;
-          // isValidDeviceConnected = true;
-        });
-      });
-    });
+  }
+
+  Future<Uint8List> getUint8ListFromDownload(Reference lyricReference) async {
+    // Get the file download URL
+    final lyricUrl = await lyricReference.getDownloadURL();
+
+    // Create a temporary directory to store the downloaded file
+    final Directory tempDir = await getTemporaryDirectory();
+    final filePath = '${tempDir.path}/${lyricReference.name}';
+
+    // Download the file to the temporary directory
+    await Dio().download(lyricUrl, filePath);
+
+    // Read the downloaded file as bytes
+    final file = File(filePath);
+    final bytes = await file.readAsBytes();
+
+    // Convert the bytes to a Uint8List
+    return Uint8List.fromList(bytes);
   }
 
   String convertToLyricTemp(KaraokeTimedText karaokeTimedText) {
@@ -685,10 +702,8 @@ class _KaraokePageState extends State<KaraokePage>
 
   void setPlaybackValidity(VoidCallback fn) {
     fn();
-    var shouldPlayLoud = isTrialAccount ||
-        isValidDeviceConnected ||
-        !isMusicTrialExpired ||
-        isFreeModeEnabled;
+    var shouldPlayLoud =
+        isTrialAccount || !isMusicTrialExpired || isFreeModeEnabled;
 
     switch (shouldPlayLoud) {
       case false:
