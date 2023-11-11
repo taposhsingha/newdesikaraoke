@@ -96,15 +96,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = NavigationItem.home.index;
-  String? _selectedItem;
+  String ?_selectedItem ;
 
-  late SearchDelegate _searchDelegate;
+  late SearchDelegate _searchDelegate;//possible change
 
   List<Music> items = List.empty(growable: true);
   List<Music> favoriteMusic = List.empty(growable: true);
   List<String> favoriteKeyList = List.empty(growable: true);
+  late SharedPreferences prefs;//possibel change
+  void main() async {
+    prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey("key")) {
+      prefs.setString("key", "");
+    }
+  }
 
-  late SharedPreferences prefs;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
 
@@ -147,8 +153,8 @@ class _HomePageState extends State<HomePage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(CupertinoIcons.search),
-            onPressed: () {
-              _searchDelegate = MusicSearchDelegate(
+            onPressed: () async {//possible change
+              _searchDelegate = await MusicSearchDelegate(
                   items, _openKaraokePage, buildNavItem,
                   prefs: prefs);
               showSearch(context: context, delegate: _searchDelegate);
@@ -809,7 +815,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-
+//possible change
 class MusicSearchDelegate extends SearchDelegate {
   final List<Music> items;
   final SharedPreferences prefs;
@@ -836,7 +842,7 @@ class MusicSearchDelegate extends SearchDelegate {
     return IconButton(
       icon: Icon(Icons.arrow_back),
       onPressed: () {
-         close(context, null);
+        close(context, null);
       },
     );
   }
