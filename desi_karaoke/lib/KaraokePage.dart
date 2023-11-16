@@ -47,7 +47,8 @@ class _KaraokePageState extends State<KaraokePage>
   List<KaraokeDevice> deviceList = [];
 
   // Disposables
-  late StreamSubscription subBluetooth;
+  /*late StreamSubscription subBluetooth;*/
+
   late StreamSubscription plyerStatusSubscription;
   late StreamSubscription playerPositionSubscription;
 
@@ -548,7 +549,7 @@ class _KaraokePageState extends State<KaraokePage>
     plyerStatusSubscription.cancel();
     audioEngine.stop();
     playerPositionSubscription.cancel();
-    subBluetooth.cancel();
+    //subBluetooth.cancel();
     WidgetsBinding.instance.removeObserver(this);
     _fluWakeLock.disable();
     super.dispose();
