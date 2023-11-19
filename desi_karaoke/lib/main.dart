@@ -96,14 +96,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = NavigationItem.home.index;
-  String ?_selectedItem ;
+  String? _selectedItem;
 
-  late SearchDelegate _searchDelegate;//possible change
+  late SearchDelegate _searchDelegate;
 
   List<Music> items = List.empty(growable: true);
   List<Music> favoriteMusic = List.empty(growable: true);
   List<String> favoriteKeyList = List.empty(growable: true);
-  late SharedPreferences prefs;//possibel change
+  late SharedPreferences prefs;
   void main() async {
     prefs = await SharedPreferences.getInstance();
     if (!prefs.containsKey("key")) {
@@ -150,10 +150,10 @@ class _HomePageState extends State<HomePage> {
             onPressed: unselectItem,
           ),
         ),
-        actions: <Widget>[
+        actions: [
           IconButton(
             icon: Icon(CupertinoIcons.search),
-            onPressed: () async {//possible change
+            onPressed: () async {
               _searchDelegate = await MusicSearchDelegate(
                   items, _openKaraokePage, buildNavItem,
                   prefs: prefs);
@@ -299,111 +299,6 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
-  /* Future buildThen() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      throw ConnectivityException(NO_CONNECTION);
-    }
-    if (items.isNotEmpty) {
-      return;
-    } else {
-      DatabaseReference musicDataRef =
-      FirebaseDatabase.instance.reference().child("music");
-      FirebaseDatabase.instance.setPersistenceEnabled(true);
-      FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
-      musicDataRef.keepSynced(true);
-      await musicDataRef
-          .once()
-          .timeout(Duration(seconds: 30),
-          onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
-          .then((DataSnapshot data) async {
-        if (prefs == null) {
-          prefs = await SharedPreferences.getInstance();
-        }
-        favoriteKeyList =
-            prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
-                List<String>();
-        List<Music> list = new List();
-        if (favoriteKeyList != null) {
-          favoriteMusic.clear();
-        }
-        data.value.forEach(
-              (key, value) {
-            Music music = Music.fromMap(value);
-            music.key = key;
-            if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
-              music.isFavorite = true;
-            }
-            list.add(music);
-          },
-        );
-        items.clear();
-        items.addAll(list);
-        items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
-      });
-    }
-  }*/
-
-  /*Future buildThen() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.none) {
-      throw ConnectivityException(NO_CONNECTION);
-    }
-    if (items.isNotEmpty) {
-      return;
-    } else {
-      DatabaseReference musicDataRef =
-          FirebaseDatabase.instance.ref().child("music");
-      FirebaseDatabase.instance.setPersistenceEnabled(true);
-      FirebaseDatabase.instance.setPersistenceCacheSizeBytes(10000000);
-      musicDataRef.keepSynced(true);
-      await musicDataRef
-          .once()
-          .timeout(Duration(seconds: 30),
-              onTimeout: () => throw TimeoutException(CONNECTION_TIMEOUT))
-          .then((DataSnapshot data) async {
-            if (prefs == null) {
-              prefs = await SharedPreferences.getInstance();
-            }
-            favoriteKeyList =
-                prefs.getStringList(SharedPreferencesKeys.FAVORITES) ??
-                    List<String>.empty();
-            List<Music> list = new List.empty();
-            if (favoriteKeyList != null) {
-              favoriteMusic.clear();
-            }
-            */ /*Map<dynamic, dynamic> musicData =
-            data.value as Map<dynamic, dynamic>;*/ /*
-            Map<String, dynamic> musicData = data.value as Map<String, dynamic>;
-            musicData.forEach(
-                  (key, value) {
-                Music music = Music.fromMap(value);
-                music.key = key;
-                if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
-                  music.isFavorite = true;
-                }
-                list.add(music);
-              },
-            );
-            */ /*Map<dynamic, dynamic> musicData =
-                data.value as Map<dynamic, dynamic>;
-            musicData.forEach(
-              (key, value) {
-                Music music = Music.fromMap(value);
-                music.key = key;
-                if (favoriteKeyList != null && favoriteKeyList.contains(key)) {
-                  music.isFavorite = true;
-                }
-                list.add(music);
-              },
-            );*/ /*
-            items.clear();
-            items.addAll(list);
-            items.sort((a, b) => a.effectivetitle.compareTo(b.effectivetitle));
-          } as FutureOr Function(DatabaseEvent value));
-    }
-  }*/
 
   StatelessWidget buildNavItem([String? filter]) {
     if (_selectedIndex == NavigationItem.home.index) {
@@ -586,7 +481,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Music> filterAndSort(List<Music> items, String cleanQuery) {
-    var list = List<Music>.empty();
+    var list = List<Music>.empty(growable: true);
     if (cleanQuery.length < 3) {
       items.forEach((item) {
         if (item.artist.toLowerCase().startsWith(cleanQuery) ||
@@ -815,7 +710,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-//possible change
+
 class MusicSearchDelegate extends SearchDelegate {
   final List<Music> items;
   final SharedPreferences prefs;
