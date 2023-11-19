@@ -153,10 +153,14 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(CupertinoIcons.search),
-            onPressed: () async {
-              _searchDelegate = await MusicSearchDelegate(
+
+            onPressed: ()  {
+
+              _searchDelegate =  MusicSearchDelegate(
                   items, _openKaraokePage, buildNavItem,
                   prefs: prefs);
+              print("=============THIS GOING ON=============");
+              print(_searchDelegate);
               showSearch(context: context, delegate: _searchDelegate);
             },
           ),
@@ -197,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Text(LocStr.of(context)!.helloWorld));
                 } else {
-                  print(snapshot.error);
+                  //print(snapshot.error);
                   return InkWell(
                       onTap: () {
                         setState(() {});
@@ -543,6 +547,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   _setSelectItem(item) {
+    //print(item);
+    //print(_searchDelegate);
+    _searchDelegate =  MusicSearchDelegate(
+        items, _openKaraokePage, buildNavItem,
+        prefs: prefs);
+    print("=============THIS GOING ON=============");
+    print(_searchDelegate);
+    showSearch(context: context, delegate: _searchDelegate);
     _searchDelegate.close(context, null);
     setState(() {
       _selectedItem = item;
