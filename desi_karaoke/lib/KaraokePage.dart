@@ -68,9 +68,12 @@ class _KaraokePageState extends State<KaraokePage>
   int _countdownPosition = 0;
   PlayerStatus? statusBeforeBackground;
   bool isFlushbarShown = false;
+  int previousEndTime = 0;
+  int nextStartTime = 0;
 
   // Data fields
   late String uid;
+  int i=0;
    int _lyricPosition=0;
   bool isMusicTrialExpired = false;
   bool isTrialAccount = false;
@@ -202,12 +205,14 @@ class _KaraokePageState extends State<KaraokePage>
           .lastKeyBefore(position - widget.music.lyricoffset);
       if (lyricPosition != _lyricPosition) {
         setState(() {
-          _lastLyric = convertToLyric(_karaoke.timedTextMap[lyricPosition]);
-          _lyricPosition = lyricPosition;
+          if(_karaoke.timedTextMap[lyricPosition]!=null){
+            _lastLyric = convertToLyric(_karaoke.timedTextMap[lyricPosition]);
+            _lyricPosition = lyricPosition;
+          }
         });
       }
       var countdownPosition = _karaoke.countdownTimes.lastKeyBefore(position);
-      if (countdownPosition != _countdownPosition) {
+      if (countdownPosition!=null && countdownPosition != _countdownPosition) {
         var countdownTime = _karaoke.countdownTimes[countdownPosition];
         if (countdownTime == null || countdownTime == "null") {
           countDownText = "";
@@ -633,14 +638,31 @@ class _KaraokePageState extends State<KaraokePage>
         karaokeTimedText.lyricHighlightEvent?.wordnumber;
 
     int highlightLine = 5;
-    if (karaokeTimedText.lyricHighlightEvent?.line ==
-        karaokeTimedText.lines?[0]) {
+    if (karaokeTimedText.lines != null && karaokeTimedText.lines.isNotEmpty) {
+      if (karaokeTimedText.lyricHighlightEvent?.line == karaokeTimedText.lines[0]) {
+        highlightLine = 0;
+      } else if (karaokeTimedText.lines.length > 1 &&
+          karaokeTimedText.lyricHighlightEvent?.line == karaokeTimedText.lines[1]) {
+        highlightLine = 1;
+      }
+    }
+    /*if (karaokeTimedText.lyricHighlightEvent?.line ==
+        karaokeTimedText.lines[0]) {
       highlightLine = 0;
     } else if (karaokeTimedText.lyricHighlightEvent?.line ==
-        karaokeTimedText.lines?[1]) {
+        karaokeTimedText.lines[1]) {
       highlightLine = 1;
-    }
-    karaokeTimedText.lines?.asMap().forEach((lineNum, line) {
+    }*/
+    karaokeTimedText.lines.asMap().forEach((lineNum, line) {
+
+      nextStartTime = line.startTime!;
+      int timediff = previousEndTime - nextStartTime;
+
+      if(timediff>=8000){
+        print("Interlude $i");
+        i++;
+      }
+      previousEndTime = line.endTime!;
       StringBuffer normalBuffer = StringBuffer();
       StringBuffer highlightBuffer = StringBuffer();
       line.words.asMap().forEach((wordNum, word) {
