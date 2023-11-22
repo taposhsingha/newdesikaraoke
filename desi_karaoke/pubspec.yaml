@@ -39,6 +39,7 @@ dependencies:
   another_flushbar: ^1.12.30
   url_launcher: ^6.1.14
   cupertino_icons: ^1.0.6
+  bordered_text: ^2.0.0
   shared_preferences: ^2.2.1
   flutter_device_type: ^0.4.0
   flu_wake_lock: ^0.0.2
