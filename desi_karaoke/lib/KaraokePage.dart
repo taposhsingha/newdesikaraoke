@@ -22,6 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flu_wake_lock/flu_wake_lock.dart';
 import 'dart:convert';
 import 'package:charset/charset.dart';
+import 'package:bordered_text/bordered_text.dart';
 
 class KaraokePage extends StatefulWidget {
   final Music music;
@@ -55,7 +56,7 @@ class _KaraokePageState extends State<KaraokePage>
   // Page state fields
   PlayerStatus? _playerStatus = PlayerStatus.NOT_INITIALIZED;
   String countDownText = "";
-  RichText _lastLyric = RichText(
+  Widget _lastLyric = RichText(
     text: TextSpan(text: "\n\n"),
   );
   FluWakeLock _fluWakeLock = FluWakeLock();
@@ -66,12 +67,16 @@ class _KaraokePageState extends State<KaraokePage>
   int _playerSpeedStep = 0;
   int _playerHalfstepDelta = 0;
   int _countdownPosition = 0;
+  int timediff=0;
   PlayerStatus? statusBeforeBackground;
   bool isFlushbarShown = false;
+  int previousEndTime = 0;
+  int nextStartTime = 0;
 
   // Data fields
   late String uid;
-  int _lyricPosition = 0;
+  int i=0;
+   int _lyricPosition=0;
   bool isMusicTrialExpired = false;
   bool isTrialAccount = false;
   bool isFreeModeEnabled = false;
@@ -202,12 +207,14 @@ class _KaraokePageState extends State<KaraokePage>
           .lastKeyBefore(position - widget.music.lyricoffset);
       if (lyricPosition != _lyricPosition) {
         setState(() {
-          _lastLyric = convertToLyric(_karaoke.timedTextMap[lyricPosition]);
-          _lyricPosition = lyricPosition;
+          if(_karaoke.timedTextMap[lyricPosition]!=null){
+            _lastLyric = convertToLyric(_karaoke.timedTextMap[lyricPosition]);
+            _lyricPosition = lyricPosition;
+          }
         });
       }
       var countdownPosition = _karaoke.countdownTimes.lastKeyBefore(position);
-      if (countdownPosition != _countdownPosition) {
+      if (countdownPosition!=null && countdownPosition != _countdownPosition) {
         var countdownTime = _karaoke.countdownTimes[countdownPosition];
         if (countdownTime == null || countdownTime == "null") {
           countDownText = "";
@@ -303,15 +310,7 @@ class _KaraokePageState extends State<KaraokePage>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          SpinningLogo(
-                            playerStatus: _playerStatus!,
-                          ),
-                          SizedBox(width: 8),
-                        ],
-                      )
+
                     ],
                   ),
                 ),
@@ -356,13 +355,13 @@ class _KaraokePageState extends State<KaraokePage>
                             clipBehavior: Clip.hardEdge,
                             child: BackdropFilter(
                               filter: ImageFilter.blur(
-                                sigmaX: 5.0,
-                                sigmaY: 5.0,
+                                sigmaX: 0.0,
+                                sigmaY: 0.0,
                               ),
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Container(
-                                  color: Colors.white54,
+                                  color: Colors.transparent,
                                   padding: const EdgeInsets.all(8.0),
                                   child: _lastLyric,
                                 ),
@@ -588,8 +587,7 @@ class _KaraokePageState extends State<KaraokePage>
       lyric = utf8.decode(bytes);
     }
 
-    print("============hi==========");
-    print(lyric);
+  
 
     _karaoke = await buildLyric(lyric);
   }
@@ -624,7 +622,8 @@ class _KaraokePageState extends State<KaraokePage>
     return stringBuffer.toString();
   }
 
-  RichText convertToLyric(KaraokeTimedText karaokeTimedText) {
+  Widget convertToLyric(KaraokeTimedText karaokeTimedText) {
+    bool hasText = false;
     List<List<String>> spanText = [
       ["", ""],
       ["", ""]
@@ -633,14 +632,37 @@ class _KaraokePageState extends State<KaraokePage>
         karaokeTimedText.lyricHighlightEvent?.wordnumber;
 
     int highlightLine = 5;
-    if (karaokeTimedText.lyricHighlightEvent?.line ==
-        karaokeTimedText.lines?[0]) {
+    if (karaokeTimedText.lines.isNotEmpty) {
+      if (karaokeTimedText.lyricHighlightEvent?.line == karaokeTimedText.lines[0]) {
+        highlightLine = 0;
+      } else if (karaokeTimedText.lines.length > 1 &&
+          karaokeTimedText.lyricHighlightEvent?.line == karaokeTimedText.lines[1]) {
+        highlightLine = 1;
+      }
+    }
+    /*if (karaokeTimedText.lyricHighlightEvent?.line ==
+        karaokeTimedText.lines[0]) {
       highlightLine = 0;
     } else if (karaokeTimedText.lyricHighlightEvent?.line ==
-        karaokeTimedText.lines?[1]) {
+        karaokeTimedText.lines[1]) {
       highlightLine = 1;
-    }
-    karaokeTimedText.lines?.asMap().forEach((lineNum, line) {
+    }*/
+    karaokeTimedText.lines.asMap().forEach((lineNum, line) {
+
+     /* nextStartTime = line.startTime!;
+       timediff = previousEndTime - nextStartTime;*/
+      print("linenum $lineNum");
+      print(karaokeLines.length);
+      nextStartTime = line.startTime!;
+
+      /*if(timediff>=8000){
+        print("startTime $nextStartTime");
+        print("endTime $previousEndTime");
+        print("timediff $timediff");
+        print("Interlude $i");
+        i++;
+      }*/
+      previousEndTime = line.endTime!;
       StringBuffer normalBuffer = StringBuffer();
       StringBuffer highlightBuffer = StringBuffer();
       line.words.asMap().forEach((wordNum, word) {
@@ -652,7 +674,16 @@ class _KaraokePageState extends State<KaraokePage>
       });
       spanText[lineNum][0] = highlightBuffer.toString();
       spanText[lineNum][1] = normalBuffer.toString().trimRight();
+
+      String highlightText = spanText[lineNum][0];
+      String normalText = spanText[lineNum][1];
+
+      if (highlightText.isNotEmpty || normalText.isNotEmpty) {
+        hasText = true;
+      }
+      print("hasText $hasText");
     });
+    if(hasText){
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
@@ -671,7 +702,28 @@ class _KaraokePageState extends State<KaraokePage>
           TextSpan(text: "${spanText[1][1]}"),
         ],
       ),
-    );
+    );}else{
+      return Image.asset("assets/backgrounds/forbgimage.png",width: 200,height: 200);
+    }
+    /*return RichText(
+      textAlign: TextAlign.center,
+      text: TextSpan(
+        style: Theme.of(context).textTheme.headlineSmall?.apply(
+            color: Colors.blue[700],
+            fontWeightDelta: 3,
+            fontSizeDelta: Device.get().isTablet ? 25 : 0),
+        children: <TextSpan>[
+          TextSpan(
+              text: "${spanText[0][0]}",
+              style: TextStyle(color: Colors.indigo[900])),
+          TextSpan(text: "${spanText[0][1]}\n"),
+          TextSpan(
+              text: "${spanText[1][0]}",
+              style: TextStyle(color: Colors.indigo[900])),
+          TextSpan(text: "${spanText[1][1]}"),
+        ],
+      ),
+    );*/
   }
 
   void _playPauseOnClick() {

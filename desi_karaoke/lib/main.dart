@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('RANGS DESI KARAOKE'),
+        title: const Text('BANGLA KARAOKE'),
         leading: Visibility(
           visible: _selectedItem != null,
           child: IconButton(
@@ -152,8 +152,8 @@ class _HomePageState extends State<HomePage> {
               _searchDelegate =  MusicSearchDelegate(
                   items, _openKaraokePage, buildNavItem,
                   prefs: prefs);
-              print("=============THIS GOING ON=============");
-              print(_searchDelegate);
+              //print("=============THIS GOING ON=============");
+              //print(_searchDelegate);
               showSearch(context: context, delegate: _searchDelegate);
             },
           ),
@@ -583,7 +583,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   List<Music> filterAndSort(List<Music> items, String cleanQuery) {
-    var list = List<Music>.empty();
+    var list = List<Music>.empty(growable:true);
     if (cleanQuery.length < 3) {
       items.forEach((item) {
         if (item.artist.toLowerCase().startsWith(cleanQuery) ||
@@ -653,7 +653,21 @@ class _HomePageState extends State<HomePage> {
     print("=============THIS GOING ON=============");
     print(_searchDelegate);
     showSearch(context: context, delegate: _searchDelegate);
-    _searchDelegate.close(context, null);
+    //_searchDelegate.close(context, null);
+    setState(() {
+      _selectedItem = item;
+    });
+  }
+  _setSelectItem2(item) {
+    //print(item);
+    //print(_searchDelegate);
+    _searchDelegate =  MusicSearchDelegate(
+        items, _openKaraokePage, buildNavItem,
+        prefs: prefs);
+    print("=============THIS GOING ON=============");
+    print(_searchDelegate);
+    showSearch(context: context, delegate: _searchDelegate);
+    //_searchDelegate.close(context, null);
     setState(() {
       _selectedItem = item;
     });
