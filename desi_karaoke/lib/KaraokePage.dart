@@ -75,8 +75,12 @@ class _KaraokePageState extends State<KaraokePage>
 
   // Data fields
   late String uid;
+
+  
   int i=0;
    int _lyricPosition=0;
+
+  
   bool isMusicTrialExpired = false;
   bool isTrialAccount = false;
   bool isFreeModeEnabled = false;
@@ -586,9 +590,6 @@ class _KaraokePageState extends State<KaraokePage>
     } else {
       lyric = utf8.decode(bytes);
     }
-
-  
-
     _karaoke = await buildLyric(lyric);
   }
 
