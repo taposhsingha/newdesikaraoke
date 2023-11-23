@@ -119,6 +119,10 @@ makeTimedTexts(Karaoke karaoke) {
     int? time = timedLines.lastKeyBefore(line.endTime!);
     LyricPair? pair = timedLines[time];
     var timeShift = line.startTime;
+    /*print("startTime:");
+    print(line.startTime);
+    print("endTime:");
+    print(line.endTime);*/
     line.durations.asMap().forEach((wordNum, duration) {
       karaoke.timedTextMap[timeShift] =
           KaraokeTimedText(pair!.toArray(), LyricHighlightEvent(line, wordNum));
