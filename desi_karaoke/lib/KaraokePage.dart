@@ -38,8 +38,9 @@ class _KaraokePageState extends State<KaraokePage>
   // Constants
   static const platform =
       const EventChannel('desikaraoke.com/bluetooth_connected_devices');
-  static const methodChannel =
-      const MethodChannel('desikaraoke.com/filedownloader');
+  /*static const methodChannel =
+      const MethodChannel('desikaraoke.com/filedownloader');*/
+  static const methodChannel = MethodChannel('desikaraoke.com/filedownloader');
   final double _iconSize = Device.get().isTablet ? 72 : 48;
 
   // Page fields
@@ -555,7 +556,9 @@ class _KaraokePageState extends State<KaraokePage>
   }
 
   _startDownload(Reference storageReference, Reference lyricReference) async {
-    String musicDownloadUrl = await storageReference.getDownloadURL();
+    //String musicDownloadUrl = await storageReference.getDownloadURL();
+    String musicDownloadUrl = await methodChannel
+        .invokeMethod("getDownloadUrl", {"path": storageReference.fullPath});
     musicDownloadUrl = musicDownloadUrl.replaceAll("(", "%28");
     musicDownloadUrl = musicDownloadUrl.replaceAll(")", "%29");
     musicDownloadUrl = musicDownloadUrl.replaceAll(" ", "%20");
@@ -685,7 +688,33 @@ class _KaraokePageState extends State<KaraokePage>
       }
       print("hasText $hasText");
     });
+
     if(hasText){
+      return Stack( children: <Widget>[
+        Text(
+          "${spanText[0][0]}",
+          style: TextStyle(
+            fontSize: Device.get().isTablet ? 40 : 30,
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1
+              ..color = Colors.white,
+          ),
+        ),
+        // Solid text as fill.
+        Text(
+          "${spanText[0][0]}",
+          style: TextStyle(
+            fontSize: Device.get().isTablet ? 40 : 30,
+            color: Colors.indigo[900],
+          ),
+        ),
+      ],alignment: AlignmentDirectional.center,);
+    }else{
+      return Image.asset("assets/backgrounds/forbgimage.png",width: 200,height: 200);
+    }
+    /*if(hasText){
+
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
@@ -696,7 +725,11 @@ class _KaraokePageState extends State<KaraokePage>
         children: <TextSpan>[
           TextSpan(
               text: "${spanText[0][0]}",
-              style: TextStyle(color: Colors.indigo[900])),
+              style: *//*TextStyle(color: Colors.indigo[900])*//*TextStyle(foreground: Paint()
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 1
+                ..color = Colors.white
+              )),
           TextSpan(text: "${spanText[0][1]}\n"),
           TextSpan(
               text: "${spanText[1][0]}",
@@ -706,7 +739,7 @@ class _KaraokePageState extends State<KaraokePage>
       ),
     );}else{
       return Image.asset("assets/backgrounds/forbgimage.png",width: 200,height: 200);
-    }
+    }*/
     /*return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(

@@ -31,16 +31,25 @@ class MainActivity : FlutterActivity(), EventChannel.StreamHandler {
     }*/
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
-        GeneratedPluginRegistrant.registerWith(flutterEngine)
-        EventChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setStreamHandler(this)
-        val methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
-        methodChannel.setMethodCallHandler { call, result ->
+        //GeneratedPluginRegistrant.registerWith(flutterEngine)
+        super.configureFlutterEngine(flutterEngine)
+        //EventChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setStreamHandler(this)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, METHOD_CHANNEL).setMethodCallHandler{
+            call,result->
             when (call.method) {
                 "getDownloadUrl" -> getDownloadURL(call.argument("path"), result)
                 "getFileFromDo"  -> getFile(call.argument("path"), result)
                 else             -> "hi"
             }
         }
+        /*val methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
+        methodChannel.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getDownloadUrl" -> getDownloadURL(call.argument("path"), result)
+                "getFileFromDo"  -> getFile(call.argument("path"), result)
+                else             -> "hi"
+            }
+        }*/
     }
 
     private fun getDownloadURL(path: String?, result: MethodChannel.Result) {

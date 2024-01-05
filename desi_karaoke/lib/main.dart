@@ -653,10 +653,12 @@ class _HomePageState extends State<HomePage> {
     print("=============THIS GOING ON=============");
     print(_searchDelegate);
     showSearch(context: context, delegate: _searchDelegate);
-    //_searchDelegate.close(context, null);
+
+
     setState(() {
       _selectedItem = item;
     });
+    //_searchDelegate.close(context, null);
   }
   _setSelectItem2(item) {
     //print(item);
