@@ -1,7 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.desikaraoke.lite">
-
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.faketouch"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.telephony"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.camera"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.nfc"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.location.gps"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.microphone"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.sensor"
+    android:required="false"/>
+    <uses-feature android:name="android.hardware.wifi"
+    android:required="false"/>
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
          In most cases you can leave this as-is, but you if you want to provide
@@ -11,7 +28,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:label="Desi Karaoke"
+        android:label="Bangla Karaoke"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
             android:name=".MainActivity"

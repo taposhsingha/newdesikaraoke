@@ -362,7 +362,8 @@ class _KaraokePageState extends State<KaraokePage>
                               child: SizedBox(
                                 width: double.infinity,
                                 child: Container(
-                                  color: Colors.transparent,
+                                  /*color: Colors.transparent,*/
+                                    color: countDownText == "" ?Colors.transparent: Colors.white54,
                                   padding: const EdgeInsets.all(8.0),
                                   child: _lastLyric,
                                 ),
@@ -688,8 +689,33 @@ class _KaraokePageState extends State<KaraokePage>
       }
       print("hasText $hasText");
     });
-
     if(hasText){
+      return Container(
+        color: Colors.white54,
+        padding: const EdgeInsets.all(8.0),
+        child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+              style: Theme.of(context).textTheme.headlineSmall?.apply(
+                  color: Colors.blue[700],
+                  fontWeightDelta: 3,
+                  fontSizeDelta: Device.get().isTablet ? 25 : 0),
+              children: <TextSpan>[
+          TextSpan(
+              text: "${spanText[0][0]}",
+              style: TextStyle(color: Colors.indigo[900])),
+    TextSpan(text: "${spanText[0][1]}\n"),
+    TextSpan(
+    text: "${spanText[1][0]}",
+    style: TextStyle(color: Colors.indigo[900])),
+    TextSpan(text: "${spanText[1][1]}"),
+    ],
+    ),
+    ));}else{
+    return Image.asset("assets/backgrounds/forbgimage.png",width: 200,height: 200);
+    }
+
+    /*if(hasText){
       return Stack( children: <Widget>[
         Text(
           "${spanText[0][0]}",
@@ -712,7 +738,7 @@ class _KaraokePageState extends State<KaraokePage>
       ],alignment: AlignmentDirectional.center,);
     }else{
       return Image.asset("assets/backgrounds/forbgimage.png",width: 200,height: 200);
-    }
+    }*/
     /*if(hasText){
 
     return RichText(
